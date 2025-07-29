@@ -1,0 +1,96 @@
+@font-face {
+  font-family: "CustomMath";
+  src: url(resource/LMMath-Regular.woff2) format("woff2");
+  font-weight: normal;
+  /* font-style: italic; */
+}
+@font-face {
+  font-family: "CustomRomanItalic";
+  src: url(resource/LMRoman10-Italic.woff2)
+    format("woff2");
+  font-weight: normal;
+  font-style: italic;
+}
+@font-face {
+  font-family: "CustomRomanRegular";
+  src: url(resource/LMRoman10-Regular.woff2)
+    format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.dcg-mq-math-mode var {
+  font-family: "CustomRomanItalic", "CustomMath" !important;
+  font-style: italic !important;
+  /* イタリック体は右にズレて見えてしまう */
+  display: inline-block;
+  transform: translateX(-1px);
+}
+.dcg-mq-math-mode .dcg-mq-operator-name {
+  font-family: "CustomRomanRegular" !important;
+  font-style: normal !important;
+}
+.dcg-mq-math-mode .dcg-mq-binary-operator {
+  font-family: "CustomMath" !important;
+}
+
+/* 数字・infinity */
+.dcg-mq-math-mode .dcg-mq-root-block {
+  font-family: "CustomMath" !important;
+  font-style: normal !important;
+}
+/* π */
+.dcg-mq-math-mode .dcg-mq-nonSymbola:not(.dcg-mq-operator-name) {
+  font-family: "CustomMath" !important;
+  font-style: italic !important;
+}
+/* percent */
+.dcg-mq-math-mode .dcg-mq-nonSymbola.dcg-mq-operator-name {
+  font-family: "CustomRomanRegular" !important;
+  font-style: normal !important;
+}
+
+/* integral */
+.dcg-exppanel-container .dcg-mq-int {
+  position: relative;
+  display: inline-block;
+}
+.dcg-exppanel-container .dcg-mq-int::before {
+  content: "⌠\A⌡";
+  font-family: "CustomMath";
+  font-size: 0.8em;
+  position: absolute;
+  left: 0.3rem;
+  top: 50%;
+  transform: translateY(-32%);
+  line-height: 1.3;
+  white-space: pre;
+  display: inline-block;
+  text-align: center;
+}
+.dcg-exppanel-container .dcg-mq-int .dcg-mq-non-leaf {
+  position: relative;
+}
+.dcg-exppanel-container .dcg-mq-int > big {
+  color: transparent;
+}
+
+/* ΣΠの下に余白 */
+.dcg-mq-math-mode big {
+  margin-bottom: 0.2rem !important;
+}
+
+/* ()内の上側の余白をなくす */
+.dcg-mq-math-mode .dcg-mq-bracket-middle {
+  margin-top: 0 !important;
+}
+
+/* 数式スクロール */
+.dcg-mq-editable-field
+  .dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block {
+  overflow-x: auto;
+}
+.dcg-mq-editable-field
+  .dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block {
+  scrollbar-width: none;
+}
