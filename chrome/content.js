@@ -150,7 +150,7 @@ document.addEventListener(
       }
 
       showCopyPastePopup(touchStartX, touchStartY, rootBlock);
-    }, 1000);
+    }, 300);
   },
   { passive: true }
 );
@@ -183,6 +183,16 @@ document.addEventListener(
       clearTimeout(longPressTimer);
       longPressTimer = null;
     }
+
+    // ポップアップが表示されている場合、フォーカスを維持
+    if (currentPopup) {
+      // 少し遅延してからポップアップにフォーカスを戻す
+      setTimeout(() => {
+        if (currentPopup && currentPopup.parentNode) {
+          currentPopup.focus();
+        }
+      }, 10);
+    }
   },
   { passive: true }
 );
@@ -195,27 +205,80 @@ document.addEventListener(
       clearTimeout(longPressTimer);
       longPressTimer = null;
     }
+
+    // ポップアップが表示されている場合、フォーカスを維持
+    if (currentPopup) {
+      // 少し遅延してからポップアップにフォーカスを戻す
+      setTimeout(() => {
+        if (currentPopup && currentPopup.parentNode) {
+          currentPopup.focus();
+        }
+      }, 10);
+    }
   },
   { passive: true }
 );
 
 // ポップアップを表示する関数
-function showCopyPastePopup(x, y, rootBlock) {
+async function showCopyPastePopup(x, y, rootBlock) {
   // 既存のポップアップを削除
   removeExistingPopup();
+
+  // バーチャルキーボードを閉じるためにフォーカスを外す
+  if (document.activeElement && document.activeElement.blur) {
+    document.activeElement.blur();
+  }
+
+  // バーチャルキーボードが閉じるまで少し待機
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  // クリップボードの内容をチェック
+  let hasClipboardContent = false;
+  try {
+    const clipboardText = await navigator.clipboard.readText();
+    hasClipboardContent = clipboardText && clipboardText.trim().length > 0;
+  } catch (error) {
+    console.log("クリップボードアクセスできません:", error);
+    hasClipboardContent = true;
+  }
 
   // ポップアップ要素を作成
   const popup = document.createElement("div");
   popup.className = "math-popup";
   popup.innerHTML = `
     <button class="math-popup-btn copy-btn">copy</button>
-    <button class="math-popup-btn paste-btn">paste</button>
+    <button class="math-popup-btn paste-btn" ${
+      !hasClipboardContent ? "disabled" : ""
+    }>paste</button>
   `;
+
+  // 画面端での位置調整
+  const popupWidth = 140; // ポップアップの推定幅
+  const popupHeight = 60; // ポップアップの推定高さ
+  const margin = 10; // 画面端からのマージン
+
+  // X座標の調整
+  let adjustedX = x;
+  if (x + popupWidth + margin > window.innerWidth) {
+    adjustedX = window.innerWidth - popupWidth - margin;
+  }
+  if (adjustedX < margin) {
+    adjustedX = margin;
+  }
+
+  // Y座標の調整
+  let adjustedY = y - 60;
+  if (adjustedY < margin) {
+    adjustedY = y + 20; // カーソルの下に表示
+  }
+  if (adjustedY + popupHeight + margin > window.innerHeight) {
+    adjustedY = window.innerHeight - popupHeight - margin;
+  }
 
   // スタイルを設定
   popup.style.position = "fixed";
-  popup.style.left = x + "px";
-  popup.style.top = y - 60 + "px";
+  popup.style.left = adjustedX + "px";
+  popup.style.top = adjustedY + "px";
   popup.style.zIndex = "10000";
   popup.style.backgroundColor = "white";
   popup.style.border = "1px solid #ccc";
@@ -224,22 +287,75 @@ function showCopyPastePopup(x, y, rootBlock) {
   popup.style.padding = "4px";
   popup.style.display = "flex";
   popup.style.gap = "4px";
+  popup.style.outline = "none"; // フォーカス時のアウトラインを除去
+
+  // ポップアップをtabindexで修正できるようにする
+  popup.setAttribute("tabindex", "-1");
 
   document.body.appendChild(popup);
   currentPopup = popup;
+
+  // ポップアップにフォーカスを設定
+  popup.focus();
+
+  // 確実にフォーカスされるように少し遅延してもう一度試行
+  setTimeout(() => {
+    if (popup && popup.parentNode) {
+      popup.focus();
+    }
+  }, 50);
+
+  // フォーカスが外れることを防ぐためのイベントリスナー
+  const maintainFocus = (event) => {
+    // ポップアップ外の要素にフォーカスが移った場合、ポップアップに戻す
+    if (currentPopup && !currentPopup.contains(event.target)) {
+      event.preventDefault();
+      setTimeout(() => {
+        if (currentPopup && currentPopup.parentNode) {
+          currentPopup.focus();
+        }
+      }, 0);
+    }
+  };
+
+  // フォーカス変更を監視
+  document.addEventListener("focusin", maintainFocus);
+
+  // ポップアップが削除される時にイベントリスナーも削除
+  const originalRemove = popup.remove;
+  popup.remove = function () {
+    document.removeEventListener("focusin", maintainFocus);
+    originalRemove.call(this);
+  };
 
   // ボタンのイベントリスナー
   const copyBtn = popup.querySelector(".copy-btn");
   const pasteBtn = popup.querySelector(".paste-btn");
 
   copyBtn.addEventListener("click", () => {
-    copyMathExpression(rootBlock);
-    removeExistingPopup();
+    // 即座に視覚的フィードバック
+    copyBtn.style.backgroundColor = "#dee2e6";
+    copyBtn.style.transform = "scale(0.95)";
+
+    // バーチャルキーボードが閉じる処理を待つため少し遅延
+    setTimeout(() => {
+      copyMathExpression(rootBlock);
+      removeExistingPopup();
+    }, 150);
   });
 
   pasteBtn.addEventListener("click", () => {
-    pasteMathExpression(rootBlock);
-    removeExistingPopup();
+    if (!pasteBtn.disabled) {
+      // 即座に視覚的フィードバック
+      pasteBtn.style.backgroundColor = "#dee2e6";
+      pasteBtn.style.transform = "scale(0.95)";
+
+      // バーチャルキーボードが閉じる処理を待つため少し遅延
+      setTimeout(() => {
+        pasteMathExpression(rootBlock);
+        removeExistingPopup();
+      }, 150);
+    }
   });
 
   // 外部タッチでポップアップを閉じる
@@ -331,30 +447,33 @@ function fallbackCopy(text) {
 // 数式をペーストする関数
 async function pasteMathExpression(rootBlock) {
   try {
-    const text = await navigator.clipboard.readText();
-    const expId = rootBlock.getAttribute("expr-id") || "";
+    try {
+      const text = await navigator.clipboard.readText();
+      const expId = rootBlock.getAttribute("expr-id") || "";
 
-    if (!expId) {
-      console.error("数式IDが見つかりません");
-      return;
+      if (!expId) {
+        console.error("数式IDが見つかりません");
+        showToast("数式IDが見つかりません");
+        return;
+      }
+
+      // ページのコンテキストでCalcにアクセスしてLatexを設定（非同期）
+      const success = await setExpressionLatex(expId, text);
+
+      if (success) {
+        console.log("数式をペーストしました:", text);
+        showToast("ペーストしました");
+      } else {
+        console.error("数式の設定に失敗しました");
+        showToast("ペーストに失敗しました");
+      }
+    } catch (clipboardError) {
+      console.error("クリップボードアクセス失敗:", clipboardError);
+      showToast("クリップボードにアクセスできません。手動でペーストしてください。");
     }
-
-    // ページのコンテキストでCalcにアクセスしてLatexを設定（非同期）
-    const success = await setExpressionLatex(expId, text);
-
-    if (success) {
-      console.log("数式をペーストしました:", text);
-      showToast("ペーストしました");
-    } else {
-      console.error("数式の設定に失敗しました");
-      // フォールバック: 従来の方法を試行
-      fallbackPaste(rootBlock, text);
-    }
-  } catch (err) {
-    console.error("ペーストに失敗しました:", err);
-    // モバイルではクリップボードアクセスが制限される場合があるため、
-    // ユーザーに手動での貼り付けを促す
-    showToast("クリップボードの読み取りに失敗しました");
+  } catch (error) {
+    console.error("ペースト処理でエラーが発生しました:", error);
+    showToast("ペーストに失敗しました");
   }
 }
 
@@ -381,40 +500,4 @@ function showToast(message) {
   setTimeout(() => {
     toast.remove();
   }, 2000);
-}
-
-// フォールバック用のペースト関数
-function fallbackPaste(rootBlock, text) {
-  try {
-    // フォーカスを設定
-    rootBlock.focus();
-
-    // タッチデバイスでは insertText が動作しない場合があるため、
-    // 代替手段を使用
-    if (document.execCommand("insertText", false, text)) {
-      console.log("数式をペーストしました（フォールバック1）:", text);
-      showToast("ペーストしました");
-      return;
-    }
-
-    // 既存の内容を選択してテキストを置換
-    const selection = window.getSelection();
-    const range = document.createRange();
-    range.selectNodeContents(rootBlock);
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    if (document.execCommand("insertText", false, text)) {
-      console.log("数式をペーストしました（フォールバック2）:", text);
-      showToast("ペーストしました");
-    } else {
-      // 最終的なフォールバック
-      rootBlock.textContent = text;
-      console.log("数式をペーストしました（直接設定）:", text);
-      showToast("ペーストしました");
-    }
-  } catch (error) {
-    console.error("フォールバックペーストでエラー:", error);
-    showToast("ペーストに失敗しました");
-  }
 }
