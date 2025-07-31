@@ -238,7 +238,6 @@ async function showCopyPastePopup(x, y, rootBlock) {
     const clipboardText = await navigator.clipboard.readText();
     hasClipboardContent = clipboardText && clipboardText.trim().length > 0;
   } catch (error) {
-    console.log("クリップボードアクセスできません:", error);
     hasClipboardContent = true;
   }
 
@@ -246,10 +245,16 @@ async function showCopyPastePopup(x, y, rootBlock) {
   const popup = document.createElement("div");
   popup.className = "math-popup";
   popup.innerHTML = `
-    <button class="math-popup-btn copy-btn">copy</button>
-    <button class="math-popup-btn paste-btn" ${
-      !hasClipboardContent ? "disabled" : ""
-    }>paste</button>
+    <button class="math-popup-btn copy-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z" fill="currentColor"/>
+      </svg>
+    </button>
+    <button class="math-popup-btn paste-btn" ${!hasClipboardContent ? "disabled" : ""}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M19 2H14.82C14.4 0.84 13.3 0 12 0C10.7 0 9.6 0.84 9.18 2H5C3.9 2 3 2.9 3 4V18C3 19.1 3.9 20 5 20H19C20.1 20 21 19.1 21 18V4C21 2.9 20.1 2 19 2ZM12 2C12.55 2 13 2.45 13 3C13 3.55 12.55 4 12 4C11.45 4 11 3.55 11 3C11 2.45 11.45 2 12 2ZM19 18H5V4H7V7H17V4H19V18Z" fill="currentColor"/>
+      </svg>
+    </button>
   `;
 
   // 画面端での位置調整
@@ -396,7 +401,6 @@ async function copyMathExpression(rootBlock) {
     const expId = rootBlock.getAttribute("expr-id") || "";
 
     if (!expId) {
-      console.error("数式IDが見つかりません");
       return;
     }
 
@@ -404,7 +408,6 @@ async function copyMathExpression(rootBlock) {
     const mathText = await getExpressionLatex(expId);
 
     if (!mathText) {
-      console.error("数式の取得に失敗しました");
       // フォールバック: テキストコンテンツを使用
       const fallbackText = rootBlock.textContent || rootBlock.innerText || "";
       if (fallbackText) {
@@ -415,7 +418,7 @@ async function copyMathExpression(rootBlock) {
 
     copyToClipboard(mathText);
   } catch (error) {
-    console.error("コピー処理でエラーが発生しました:", error);
+    // エラーハンドリング
   }
 }
 
@@ -424,11 +427,9 @@ function copyToClipboard(text) {
   navigator.clipboard
     .writeText(text)
     .then(() => {
-      console.log("数式をコピーしました:", text);
-      showToast("コピーしました");
+      showToast("Copied");
     })
     .catch((err) => {
-      console.error("コピーに失敗しました:", err);
       // fallback: テキスト選択方式
       fallbackCopy(text);
     });
@@ -452,8 +453,7 @@ async function pasteMathExpression(rootBlock) {
       const expId = rootBlock.getAttribute("expr-id") || "";
 
       if (!expId) {
-        console.error("数式IDが見つかりません");
-        showToast("数式IDが見つかりません");
+        showToast("Expression ID not found");
         return;
       }
 
@@ -461,19 +461,15 @@ async function pasteMathExpression(rootBlock) {
       const success = await setExpressionLatex(expId, text);
 
       if (success) {
-        console.log("数式をペーストしました:", text);
-        showToast("ペーストしました");
+        showToast("Pasted");
       } else {
-        console.error("数式の設定に失敗しました");
-        showToast("ペーストに失敗しました");
+        showToast("Paste failed");
       }
     } catch (clipboardError) {
-      console.error("クリップボードアクセス失敗:", clipboardError);
-      showToast("クリップボードにアクセスできません。手動でペーストしてください。");
+      showToast("Cannot access clipboard. Please paste manually.");
     }
   } catch (error) {
-    console.error("ペースト処理でエラーが発生しました:", error);
-    showToast("ペーストに失敗しました");
+    showToast("Paste failed");
   }
 }
 
