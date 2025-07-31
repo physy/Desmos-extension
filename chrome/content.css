@@ -24,7 +24,7 @@
   font-style: italic !important;
   /* イタリック体は右にズレて見えてしまう */
   display: inline-block;
-  transform: translateX(-1px);
+  margin-right: 1px;
 }
 .dcg-mq-math-mode .dcg-mq-operator-name {
   font-family: "CustomRomanRegular" !important;
