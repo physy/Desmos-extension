@@ -11,13 +11,14 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["resource/*.woff2"],
+      "resources": ["resource/*.woff2", "injected.js"],
       "matches": ["https://www.desmos.com/*"]
     }
   ],
   "content_scripts": [
     {
       "css": ["content.css"],
+      "js": ["content.js"],
       "matches": ["https://www.desmos.com/*"]
     }
   ]
