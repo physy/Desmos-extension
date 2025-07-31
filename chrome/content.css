@@ -19,13 +19,18 @@
   font-style: normal;
 }
 
-.dcg-mq-math-mode var {
+.dcg-mq-math-mode var:not(.dcg-mq-operator-name) {
   font-family: "CustomRomanItalic", "CustomMath" !important;
   font-style: italic !important;
   /* イタリック体は右にズレて見えてしまう */
-  display: inline-block;
-  margin-right: 1px;
+  display: inline-block !important;
+  padding-right: 0.5px !important;
+  padding-left: -0.5px !important;
 }
+/* var.dcg-mq-f {
+  margin-right: 0.2em !important;
+  margin-left: 0.1em !important;
+} */
 .dcg-mq-math-mode .dcg-mq-operator-name {
   font-family: "CustomRomanRegular" !important;
   font-style: normal !important;
