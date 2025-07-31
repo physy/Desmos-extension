@@ -144,6 +144,11 @@ document.addEventListener(
         return;
       }
 
+      // 長押し完了時にのみキーボードを隠す
+      if (document.activeElement && document.activeElement.blur) {
+        document.activeElement.blur();
+      }
+
       // 振動フィードバック（対応デバイスのみ）
       if (navigator.vibrate) {
         navigator.vibrate(50);
@@ -178,14 +183,24 @@ document.addEventListener(
 // タッチエンド
 document.addEventListener(
   "touchend",
-  () => {
+  (event) => {
+    // 長押しタイマーが有効な場合（長押しが完了していない場合）
     if (longPressTimer) {
       clearTimeout(longPressTimer);
       longPressTimer = null;
+      // 通常のタッチ操作なので、キーボード制御は行わない
     }
 
-    // ポップアップが表示されている場合、フォーカスを維持
+    // ポップアップが表示されている場合、キーボード表示を防ぐ
     if (currentPopup) {
+      // タッチエンドによるフォーカス変更を防ぐ
+      event.preventDefault();
+
+      // アクティブな要素からフォーカスを外す
+      if (document.activeElement && document.activeElement.blur) {
+        document.activeElement.blur();
+      }
+
       // 少し遅延してからポップアップにフォーカスを戻す
       setTimeout(() => {
         if (currentPopup && currentPopup.parentNode) {
@@ -194,16 +209,15 @@ document.addEventListener(
       }, 10);
     }
   },
-  { passive: true }
-);
-
-// タッチキャンセル
+  { passive: false } // preventDefaultを使うためpassive: falseにする
+); // タッチキャンセル
 document.addEventListener(
   "touchcancel",
-  () => {
+  (event) => {
     if (longPressTimer) {
       clearTimeout(longPressTimer);
       longPressTimer = null;
+      // タッチキャンセル時も通常のタッチ操作なので、キーボード制御は行わない
     }
 
     // ポップアップが表示されている場合、フォーカスを維持
@@ -300,6 +314,16 @@ async function showCopyPastePopup(x, y, rootBlock) {
   document.body.appendChild(popup);
   currentPopup = popup;
 
+  // ポップアップ表示後も確実にキーボードを隠す
+  const mathFields = document.querySelectorAll(
+    ".dcg-mq-editable-field input, .dcg-mq-textarea, .dcg-mq-root-block[contenteditable]"
+  );
+  mathFields.forEach((field) => {
+    if (field.blur) field.blur();
+    field.setAttribute("readonly", "true");
+    field.setAttribute("contenteditable", "false");
+  });
+
   // ポップアップにフォーカスを設定
   popup.focus();
 
@@ -312,9 +336,25 @@ async function showCopyPastePopup(x, y, rootBlock) {
 
   // フォーカスが外れることを防ぐためのイベントリスナー
   const maintainFocus = (event) => {
+    // ポップアップのボタンがクリックされた場合は制御しない
+    if (currentPopup && currentPopup.contains(event.target)) {
+      return;
+    }
+
     // ポップアップ外の要素にフォーカスが移った場合、ポップアップに戻す
     if (currentPopup && !currentPopup.contains(event.target)) {
       event.preventDefault();
+      event.stopPropagation();
+
+      // 数式フィールドへのフォーカスを特に阻止
+      if (
+        event.target.closest(".dcg-mq-root-block") ||
+        event.target.classList.contains("dcg-mq-editable-field") ||
+        event.target.closest(".dcg-mq-editable-field")
+      ) {
+        event.target.blur();
+      }
+
       setTimeout(() => {
         if (currentPopup && currentPopup.parentNode) {
           currentPopup.focus();
@@ -337,31 +377,83 @@ async function showCopyPastePopup(x, y, rootBlock) {
   const copyBtn = popup.querySelector(".copy-btn");
   const pasteBtn = popup.querySelector(".paste-btn");
 
-  copyBtn.addEventListener("click", () => {
-    // 即座に視覚的フィードバック
-    copyBtn.style.backgroundColor = "#dee2e6";
-    copyBtn.style.transform = "scale(0.95)";
+  copyBtn.addEventListener(
+    "click",
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    // バーチャルキーボードが閉じる処理を待つため少し遅延
-    setTimeout(() => {
-      copyMathExpression(rootBlock);
-      removeExistingPopup();
-    }, 150);
-  });
-
-  pasteBtn.addEventListener("click", () => {
-    if (!pasteBtn.disabled) {
       // 即座に視覚的フィードバック
-      pasteBtn.style.backgroundColor = "#dee2e6";
-      pasteBtn.style.transform = "scale(0.95)";
+      copyBtn.style.backgroundColor = "#dee2e6";
+      copyBtn.style.transform = "scale(0.95)";
 
       // バーチャルキーボードが閉じる処理を待つため少し遅延
       setTimeout(() => {
-        pasteMathExpression(rootBlock);
+        copyMathExpression(rootBlock);
         removeExistingPopup();
       }, 150);
-    }
-  });
+    },
+    true
+  ); // キャプチャフェーズで実行
+
+  // モバイル用のタッチイベントも追加
+  copyBtn.addEventListener(
+    "touchend",
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      copyBtn.style.backgroundColor = "#dee2e6";
+      copyBtn.style.transform = "scale(0.95)";
+
+      setTimeout(() => {
+        copyMathExpression(rootBlock);
+        removeExistingPopup();
+      }, 150);
+    },
+    true
+  );
+
+  pasteBtn.addEventListener(
+    "click",
+    (e) => {
+      if (!pasteBtn.disabled) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // 即座に視覚的フィードバック
+        pasteBtn.style.backgroundColor = "#dee2e6";
+        pasteBtn.style.transform = "scale(0.95)";
+
+        // バーチャルキーボードが閉じる処理を待つため少し遅延
+        setTimeout(() => {
+          pasteMathExpression(rootBlock);
+          removeExistingPopup();
+        }, 150);
+      }
+    },
+    true
+  ); // キャプチャフェーズで実行
+
+  // モバイル用のタッチイベントも追加
+  pasteBtn.addEventListener(
+    "touchend",
+    (e) => {
+      if (!pasteBtn.disabled) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        pasteBtn.style.backgroundColor = "#dee2e6";
+        pasteBtn.style.transform = "scale(0.95)";
+
+        setTimeout(() => {
+          pasteMathExpression(rootBlock);
+          removeExistingPopup();
+        }, 150);
+      }
+    },
+    true
+  );
 
   // 外部タッチでポップアップを閉じる
   setTimeout(() => {
@@ -373,6 +465,15 @@ async function showCopyPastePopup(x, y, rootBlock) {
 // 既存のポップアップを削除
 function removeExistingPopup() {
   if (currentPopup) {
+    // readonly属性を削除して通常の入力を復元
+    const mathFields = document.querySelectorAll(
+      ".dcg-mq-editable-field input, .dcg-mq-textarea, .dcg-mq-root-block[readonly], .dcg-mq-root-block[contenteditable='false']"
+    );
+    mathFields.forEach((field) => {
+      field.removeAttribute("readonly");
+      field.setAttribute("contenteditable", "true");
+    });
+
     currentPopup.remove();
     currentPopup = null;
     document.removeEventListener("touchstart", closePopupOnOutsideTouch);
