@@ -27,6 +27,10 @@
   padding-right: 0.5px !important;
   padding-left: -0.5px !important;
 }
+.dcg-graph-outer var {
+  /* ラベルの文字が上下にズレてしまうのを防ぐための調整 */
+  vertical-align: 10px !important;
+}
 /* var.dcg-mq-f {
   margin-right: 0.2em !important;
   margin-left: 0.1em !important;
