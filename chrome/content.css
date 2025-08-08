@@ -29,7 +29,7 @@
 }
 .dcg-graph-outer var {
   /* ラベルの文字が上下にズレてしまうのを防ぐための調整 */
-  vertical-align: 10px !important;
+  vertical-align: 0.1em !important;
 }
 /* var.dcg-mq-f {
   margin-right: 0.2em !important;
