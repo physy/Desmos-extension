@@ -19,13 +19,16 @@
   font-style: normal;
 }
 
-.dcg-mq-math-mode var:not(.dcg-mq-operator-name) {
+/* \mathit\mathrm\mathbf\mathsf\mathtt には当てない */
+.dcg-mq-math-mode *:not(.dcg-mq-font) > var:not(.dcg-mq-operator-name) {
   font-family: "CustomRomanItalic", "CustomMath" !important;
   font-style: italic !important;
-  /* イタリック体は右にズレて見えてしまう */
+}
+.dcg-mq-math-mode *:not(.dcg-mq-font) > var:not(.dcg-mq-operator-name, .dcg-mq-f) {
+  /* イタリック体は右にズレて見えてしまうのでf以外修正 */
   display: inline-block !important;
-  padding-right: 0.5px !important;
-  padding-left: -0.5px !important;
+  padding-right: 0.05em !important; /* margin-rightはfの右余白と競合する */
+  margin-left: -0.05em !important; /* paddingはネガティブマージン不可能 */
 }
 .dcg-graph-outer var {
   /* ラベルの文字が上下にズレてしまうのを防ぐための調整 */
