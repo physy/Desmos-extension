@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # 拡張機能のZIPパッケージを生成するスクリプト
-# 使用方法: ./create_packages.sh
 
 set -e
 
@@ -52,15 +51,3 @@ if [ -f "${SCRIPT_DIR}/desmos-math-font-enhancer-firefox.zip" ]; then
     FIREFOX_SIZE=$(du -h "${SCRIPT_DIR}/desmos-math-font-enhancer-firefox.zip" | cut -f1)
     echo "  🦊 desmos-math-font-enhancer-firefox.zip (${FIREFOX_SIZE}) - Firefox Add-ons用"
 fi
-
-echo ""
-echo "🚀 公開手順:"
-echo "【Chrome Web Store】"
-echo "1. https://chrome.google.com/webstore/devconsole/ にアクセス"
-echo "2. 新しいアイテムをクリック"
-echo "3. desmos-math-font-enhancer-chrome.zip をアップロード"
-echo ""
-echo "【Firefox Add-ons】"
-echo "1. https://addons.mozilla.org/developers/ にアクセス"
-echo "2. Submit a New Add-on をクリック"
-echo "3. desmos-math-font-enhancer-firefox.zip をアップロード"
