@@ -10,6 +10,8 @@
     format("woff2");
   font-weight: normal;
   font-style: italic;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0;
 }
 @font-face {
   font-family: "CustomRomanRegular";
@@ -17,6 +19,8 @@
     format("woff2");
   font-weight: normal;
   font-style: normal;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0;
 }
 
 /* \mathit\mathrm\mathbf\mathsf\mathtt には当てない */
