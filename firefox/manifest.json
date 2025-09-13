@@ -1,7 +1,7 @@
 {
   "name": "Desmos Math Font Enhancer",
   "description": "Enhances mathematical expressions in Desmos Calculator with beautiful LaTeX-style fonts.",
-  "version": "1.0.4",
+  "version": "1.0.8",
   "manifest_version": 2,
   "icons": {
     "16": "icons/icon16.png",
@@ -9,12 +9,16 @@
     "128": "icons/icon128.png"
   },
   "web_accessible_resources": [
-    "resource/*.woff2"
+    "resource/*.woff2",
+    "injected.js"
   ],
   "content_scripts": [
     {
       "css": [
         "content.css"
+      ],
+      "js": [
+        "content.js"
       ],
       "matches": [
         "https://www.desmos.com/*"

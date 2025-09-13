@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Chrome拡張機能をFirefox版に変換するスクリプト
-# 使用方法: ./convert_to_firefox.sh
 
 set -e
 
@@ -77,22 +76,3 @@ echo "Firefox版ZIPファイルを生成中..."
 cd "$FIREFOX_DIR"
 zip -r "../desmos-math-font-enhancer-firefox.zip" . -x "*.DS_Store"
 cd "$SCRIPT_DIR"
-
-echo "✅ Firefox版への変換が完了しました！"
-echo ""
-echo "📂 出力先: $FIREFOX_DIR"
-echo "📦 生成されたZIPファイル:"
-echo "  - desmos-math-font-enhancer-chrome.zip (Chrome Web Store用)"
-echo "  - desmos-math-font-enhancer-firefox.zip (Firefox Add-ons用)"
-echo ""
-echo "🔧 次のステップ:"
-echo "1. Firefoxを開く"
-echo "2. about:debugging に移動"
-echo "3. 「この Firefox」をクリック"
-echo "4. 「一時的なアドオンを読み込む」をクリック"
-echo "5. firefox/manifest.json を選択"
-echo ""
-echo "💡 注意事項:"
-echo "- Firefox版は一時的なアドオンとして読み込まれます"
-echo "- 本格的な配布にはFirefox Add-onsでの署名が必要です"
-echo "- manifest.json の permissions や content_scripts は必要に応じて調整してください"
