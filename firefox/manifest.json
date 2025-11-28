@@ -1,7 +1,7 @@
 {
-  "name": "Desmos Math Font Enhancer",
-  "description": "Enhances mathematical expressions in Desmos Calculator with beautiful LaTeX-style fonts.",
-  "version": "1.0.9",
+  "name": "Desmos with Modern Math Font",
+  "description": "Replaces Desmos's math font with a modern style.",
+  "version": "1.0.10",
   "manifest_version": 2,
   "icons": {
     "16": "icons/icon16.png",

@@ -6,7 +6,7 @@
 }
 @font-face {
   font-family: "CustomRomanItalic";
-  src: url(chrome-extension://__MSG_@@extension_id__/resource/LMRoman10-Italic.woff2)
+  src: url(chrome-extension://__MSG_@@extension_id__/resource/LMRoman10-Italic-v2.woff2)
     format("woff2");
   font-weight: normal;
   font-style: italic;
