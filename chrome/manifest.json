@@ -1,7 +1,7 @@
 {
   "name": "Desmos with Modern Math Font",
   "description": "Replaces Desmos's math font with a modern style.",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "author": "UJ",
   "manifest_version": 3,
   "icons": {
@@ -11,7 +11,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["resource/*.woff2", "injected.js"],
+      "resources": ["resource/*.woff2"],
       "matches": ["https://www.desmos.com/*"]
     }
   ],
