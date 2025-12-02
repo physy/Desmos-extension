@@ -9,8 +9,7 @@
     "128": "icons/icon128.png"
   },
   "web_accessible_resources": [
-    "resource/*.woff2",
-    "injected.js"
+    "resource/*.woff2"
   ],
   "content_scripts": [
     {

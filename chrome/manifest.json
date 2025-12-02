@@ -11,7 +11,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["resource/*.woff2", "injected.js"],
+      "resources": ["resource/*.woff2"],
       "matches": ["https://www.desmos.com/*"]
     }
   ],
