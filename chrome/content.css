@@ -38,7 +38,6 @@
   /* ラベルの文字が上下にズレてしまうのを防ぐための調整 */
   vertical-align: 0.1em !important;
 }
-<<<<<<< HEAD
 /* 下付き文字内のvarは２文字以上では通常フォント,1文字ではイタリック体 */
 /* intとlogのsubscriptは除外 */
 .dcg-mq-math-mode
@@ -58,8 +57,6 @@
   margin-right: 0 !important;
   margin-left: 0 !important;
 }
-=======
->>>>>>> 87abe7b4de87a3c88c97926da7cfbf2596745dbc
 .dcg-mq-math-mode .dcg-mq-operator-name {
   font-family: "CustomRomanRegular" !important;
   font-style: normal !important;

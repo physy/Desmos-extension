@@ -1,13 +1,11 @@
 @font-face {
   font-family: "CustomMath";
-  src: url(resource/LMMath-Regular-v2.woff2)
-    format("woff2");
+  src: url(resource/LMMath-Regular-v2.woff2) format("woff2");
   font-weight: normal;
 }
 @font-face {
   font-family: "CustomRomanItalic";
-  src: url(resource/LMRoman10-Italic-v2.woff2)
-    format("woff2");
+  src: url(resource/LMRoman10-Italic-v2.woff2) format("woff2");
   font-weight: normal;
   font-style: italic;
   font-variant-ligatures: none;
@@ -15,8 +13,7 @@
 }
 @font-face {
   font-family: "CustomRomanRegular";
-  src: url(resource/LMRoman10-Regular.woff2)
-    format("woff2");
+  src: url(resource/LMRoman10-Regular.woff2) format("woff2");
   font-weight: normal;
   font-style: normal;
   font-variant-ligatures: none;
@@ -38,7 +35,6 @@
   /* ラベルの文字が上下にズレてしまうのを防ぐための調整 */
   vertical-align: 0.1em !important;
 }
-<<<<<<< HEAD
 /* 下付き文字内のvarは２文字以上では通常フォント,1文字ではイタリック体 */
 /* intとlogのsubscriptは除外 */
 .dcg-mq-math-mode
@@ -58,8 +54,6 @@
   margin-right: 0 !important;
   margin-left: 0 !important;
 }
-=======
->>>>>>> 87abe7b4de87a3c88c97926da7cfbf2596745dbc
 .dcg-mq-math-mode .dcg-mq-operator-name {
   font-family: "CustomRomanRegular" !important;
   font-style: normal !important;
