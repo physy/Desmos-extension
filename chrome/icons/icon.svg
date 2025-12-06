@@ -1,0 +1,15 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Desmos Math Font Enhancer icon">
+  <!-- Full-bleed rounded square background -->
+  <rect x="0" y="0" width="128" height="128" rx="24" fill="#0a7f4f"/>
+  <rect x="6" y="6" width="116" height="116" rx="20" fill="#0fb36f"/>
+
+  <!-- Rounded sigma glyph using stroke for softness -->
+  <path
+    d="M84 36h-40l20 28 -20 28H84"
+    fill="none"
+    stroke="#e9fff4"
+    stroke-width="11"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
