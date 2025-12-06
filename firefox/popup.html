@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Desmos Font Settings</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Font Settings (beta)</h2>
+
+      <div class="setting-item">
+        <label class="switch">
+          <input type="checkbox" id="uprightSubscript" />
+          <span class="slider"></span>
+        </label>
+        <div class="setting-info">
+          <div class="setting-title">Upright multi-character subscripts</div>
+          <div class="setting-description">
+            Display subscripts with 2+ characters in upright style
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <label class="switch">
+          <input type="checkbox" id="normalSizeSubscript" />
+          <span class="slider"></span>
+        </label>
+        <div class="setting-info">
+          <div class="setting-title">Normal size subscripts</div>
+          <div class="setting-description">Display subscripts at normal font size</div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <button id="resetBtn" class="reset-btn">Reset to Default</button>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
