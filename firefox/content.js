@@ -61,7 +61,7 @@ function applySettings() {
     css += `
 .dcg-exppanel-container .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) {
   margin-bottom: 0 !important;
-  vertical-align: bottom !important;
+  vertical-align: baseline !important;
   display: inline-block !important;
   direction: rtl !important;
 }
@@ -84,12 +84,12 @@ function applySettings() {
   margin-bottom: 0.5em;
   direction: ltr;
   display: inline-block !important;
+  vertical-align: text-bottom !important;
 }
 .dcg-exppanel-container .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sub {
   direction: ltr;
   display: inline-block !important;
   float: none !important;
-  vertical-align: bottom !important;
 }
 .dcg-exppanel-container .dcg-mq-math-mode:not(.dcg-mq-focused) var:has(+ .dcg-mq-supsub var:nth-of-type(n + 2)) {
   font-family: "CustomRomanRegular", "CustomMath", "CustomRomanItalic" !important;
