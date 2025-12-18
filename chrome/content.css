@@ -96,13 +96,3 @@
 .dcg-mq-math-mode .dcg-mq-bracket-middle {
   margin-top: 0 !important;
 }
-
-/* 数式スクロール */
-.dcg-mq-editable-field
-  .dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block {
-  overflow-x: auto;
-}
-.dcg-mq-editable-field
-  .dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block.dcg-mq-root-block {
-  scrollbar-width: none;
-}

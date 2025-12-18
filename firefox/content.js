@@ -59,20 +59,20 @@ function applySettings() {
   // Normal size subscripts
   if (currentSettings.normalSizeSubscript) {
     css += `
-.dcg-exppanel-container .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) {
   margin-bottom: 0 !important;
   vertical-align: baseline !important;
   display: inline-block !important;
   direction: rtl !important;
 }
-.dcg-exppanel-container .dcg-mq-math-mode:not(.dcg-mq-focused)
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused)
   .dcg-mq-supsub:has(var:nth-of-type(n + 2)):has(+ var) {
   margin-right: 0.2em !important;
 }
-.dcg-exppanel-container .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sub {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sub {
   font-size: 111.111% !important;
 }
-.dcg-exppanel-container .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sub  var {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sub  var {
   font-family: "CustomRomanRegular", "CustomMath", "CustomRomanItalic" !important;
   font-style: normal !important;
   padding-right: 0 !important;
@@ -80,18 +80,18 @@ function applySettings() {
   margin-right: 0 !important;
   margin-left: 0 !important;
 }
-.dcg-exppanel-container .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sup {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sup {
   margin-bottom: 0.5em;
   direction: ltr;
   display: inline-block !important;
   vertical-align: text-bottom !important;
 }
-.dcg-exppanel-container .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sub {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sub {
   direction: ltr;
   display: inline-block !important;
   float: none !important;
 }
-.dcg-exppanel-container .dcg-mq-math-mode:not(.dcg-mq-focused) var:has(+ .dcg-mq-supsub var:nth-of-type(n + 2)) {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) var:has(+ .dcg-mq-supsub var:nth-of-type(n + 2)) {
   font-family: "CustomRomanRegular", "CustomMath", "CustomRomanItalic" !important;
   font-style: initial !important;
   padding-right: 0 !important;
