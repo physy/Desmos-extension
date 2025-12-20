@@ -1,6 +1,6 @@
 @font-face {
   font-family: "CustomMath";
-  src: url(resource/LMMath-Regular-v2.woff2)
+  src: url(resource/LMMath-Regular-v3.woff2)
     format("woff2");
   font-weight: normal;
 }
@@ -58,6 +58,10 @@
 }
 /* percent */
 .dcg-mq-math-mode .dcg-mq-nonSymbola.dcg-mq-operator-name {
+  font-family: "CustomRomanRegular" !important;
+  font-style: normal !important;
+}
+.dcg-keypad-btn-content .dcg-mq-math-mode .dcg-mq-sup .dcg-mq-nonSymbola {
   font-family: "CustomRomanRegular" !important;
   font-style: normal !important;
 }
