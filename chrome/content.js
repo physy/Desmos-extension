@@ -1,7 +1,10 @@
 // デフォルト設定
 const DEFAULT_SETTINGS = {
   uprightSubscript: false,
+  uprightSubscriptMinChars: 2,
   normalSizeSubscript: false,
+  normalSizeSubscriptMinChars: 2,
+  enhancedParentheses: false,
 };
 
 // 現在の設定
@@ -35,11 +38,14 @@ function applySettings() {
 
   // Upright multi-character subscripts
   if (currentSettings.uprightSubscript) {
+    const minChars = currentSettings.uprightSubscriptMinChars || 2;
+    const hasCondition = minChars === 1 ? ":has(var)" : `:has(var:nth-of-type(n + 2))`;
+
     css += `
 .dcg-mq-math-mode
   :not(.dcg-mq-int)
   > .dcg-mq-supsub:not(.dcg-mq-after-operator-name)
-  > .dcg-mq-sub:has(var:nth-of-type(n + 2)):not(:has(.dcg-mq-font))
+  > .dcg-mq-sub${hasCondition}:not(:has(.dcg-mq-font))
   var,
 .dcg-mq-math-mode
   :not(.dcg-mq-int)
@@ -58,21 +64,24 @@ function applySettings() {
 
   // Normal size subscripts
   if (currentSettings.normalSizeSubscript) {
+    const minChars = currentSettings.normalSizeSubscriptMinChars || 2;
+    const nthType = `n + ${minChars}`;
+
     css += `
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(${nthType})) {
   margin-bottom: 0 !important;
   vertical-align: baseline !important;
   display: inline-block !important;
   direction: rtl !important;
 }
 :is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused)
-  .dcg-mq-supsub:has(var:nth-of-type(n + 2)):has(+ var) {
+  .dcg-mq-supsub:has(var:nth-of-type(${nthType})):has(+ var) {
   margin-right: 0.2em !important;
 }
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sub {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(${nthType})) .dcg-mq-sub {
   font-size: 111.111% !important;
 }
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sub  var {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(${nthType})) .dcg-mq-sub  var {
   font-family: "CustomRomanRegular", "CustomMath", "CustomRomanItalic" !important;
   font-style: normal !important;
   padding-right: 0 !important;
@@ -80,24 +89,36 @@ function applySettings() {
   margin-right: 0 !important;
   margin-left: 0 !important;
 }
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sup {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(${nthType})) .dcg-mq-sup {
   margin-bottom: 0.5em;
   direction: ltr;
   display: inline-block !important;
   vertical-align: text-bottom !important;
 }
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(n + 2)) .dcg-mq-sub {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(${nthType})) .dcg-mq-sub {
   direction: ltr;
   display: inline-block !important;
   float: none !important;
 }
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) var:has(+ .dcg-mq-supsub var:nth-of-type(n + 2)) {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) var:has(+ .dcg-mq-supsub var:nth-of-type(${nthType})) {
   font-family: "CustomRomanRegular", "CustomMath", "CustomRomanItalic" !important;
   font-style: initial !important;
   padding-right: 0 !important;
   padding-left: 0 !important;
   margin-right: 0 !important;
   margin-left: 0 !important;
+}
+    `;
+  }
+
+  // Enhanced parentheses
+  if (currentSettings.enhancedParentheses) {
+    css += `
+.dcg-mq-bracket-l.dcg-mq-paren svg[viewBox="3 0 106 186"] path {
+  d: path('M78 6 A68 101 0 0 0 81 180 c 2.2 1.2, 1 6, -3 3 A78 101 0 0 1 75 3 c 4 -3, 5.2 1.8, 3 3') !important;
+}
+.dcg-mq-bracket-r.dcg-mq-paren svg[viewBox="3 0 106 186"] path {
+  d: path('M28 6 A68 101 0 0 1 25 180 c -2.2 1.2, -1 6, 3 3 A78 101 0 0 0 31 3 c -4 -3, -5.2 1.8, -3 3') !important;
 }
     `;
   }

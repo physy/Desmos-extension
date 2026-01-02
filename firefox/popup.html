@@ -10,28 +10,57 @@
     <div class="container">
       <h2>Font Settings (beta)</h2>
 
-      <div class="setting-item">
-        <label class="switch">
-          <input type="checkbox" id="uprightSubscript" />
-          <span class="slider"></span>
-        </label>
-        <div class="setting-info">
-          <div class="setting-title">Upright multi-character subscripts</div>
-          <div class="setting-description">
-            Display subscripts with 2+ characters in upright style
+      <div class="setting-group">
+        <div class="setting-item">
+          <button class="expand-btn" id="uprightSubscriptExpand">▶</button>
+          <div class="setting-info">
+            <div class="setting-title">Upright subscripts</div>
+            <div class="setting-description">Display subscripts in upright style</div>
           </div>
+          <label class="switch">
+            <input type="checkbox" id="uprightSubscript" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-details" id="uprightSubscriptDetails" style="display: none">
+          <label class="detail-label">Minimum characters:</label>
+          <select id="uprightSubscriptMinChars" class="setting-select">
+            <option value="1">1+ chars</option>
+            <option value="2" selected>2+ chars</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-item">
+          <button class="expand-btn" id="normalSizeSubscriptExpand">▶</button>
+          <div class="setting-info">
+            <div class="setting-title">Normal size subscripts</div>
+            <div class="setting-description">Display subscripts at normal font size</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="normalSizeSubscript" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-details" id="normalSizeSubscriptDetails" style="display: none">
+          <label class="detail-label">Minimum characters:</label>
+          <select id="normalSizeSubscriptMinChars" class="setting-select">
+            <option value="1">1+ chars</option>
+            <option value="2" selected>2+ chars</option>
+          </select>
         </div>
       </div>
 
       <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-title">Enhanced parentheses</div>
+          <div class="setting-description">Improve the appearance of parentheses</div>
+        </div>
         <label class="switch">
-          <input type="checkbox" id="normalSizeSubscript" />
+          <input type="checkbox" id="enhancedParentheses" />
           <span class="slider"></span>
         </label>
-        <div class="setting-info">
-          <div class="setting-title">Normal size subscripts</div>
-          <div class="setting-description">Display subscripts at normal font size</div>
-        </div>
       </div>
 
       <div class="footer">
