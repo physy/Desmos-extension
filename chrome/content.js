@@ -5,6 +5,7 @@ const DEFAULT_SETTINGS = {
   normalSizeSubscript: false,
   normalSizeSubscriptMinChars: 2,
   enhancedParentheses: false,
+  displayStyleIntegrals: true,
 };
 
 // 現在の設定
@@ -119,6 +120,43 @@ function applySettings() {
 }
 .dcg-mq-bracket-r.dcg-mq-paren svg[viewBox="3 0 106 186"] path {
   d: path('M28 6 A68 101 0 0 1 25 180 c -2.2 1.2, -1 6, 3 3 A78 101 0 0 0 31 3 c -4 -3, -5.2 1.8, -3 3') !important;
+}
+    `;
+  }
+
+  // Display style integrals
+  if (currentSettings.displayStyleIntegrals) {
+    css += String.raw`
+.dcg-exppanel-container .dcg-mq-int {
+  position: relative;
+  display: inline-block;
+}
+.dcg-exppanel-container .dcg-mq-int::before {
+  content: "⌠\A⌡";
+  font-family: "CustomMath";
+  font-size: 0.85em;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-32%);
+  line-height: 1.3;
+  white-space: pre;
+  display: inline-block;
+  text-align: center;
+}
+.dcg-exppanel-container .dcg-mq-int .dcg-mq-non-leaf {
+  position: relative;
+}
+.dcg-exppanel-container .dcg-mq-int > big {
+  color: transparent;
+}
+.dcg-exppanel-container .dcg-mq-int > .dcg-mq-supsub > .dcg-mq-sup {
+  margin-left: 0.25em !important;
+}
+.dcg-exppanel-container .dcg-mq-int > .dcg-mq-supsub{
+  margin-left: -.5em !important;
+}
+.dcg-exppanel-container .dcg-mq-int > .dcg-mq-supsub > .dcg-mq-sup {
+  margin-left: 0.25em !important;
 }
     `;
   }

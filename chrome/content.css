@@ -65,35 +65,16 @@
   font-family: "CustomRomanRegular" !important;
   font-style: normal !important;
 }
-
-/* integral */
-.dcg-exppanel-container .dcg-mq-int {
-  position: relative;
-  display: inline-block;
-}
-.dcg-exppanel-container .dcg-mq-int::before {
-  content: "⌠\A⌡";
-  font-family: "CustomMath";
-  font-size: 0.8em;
-  position: absolute;
-  left: 0.3rem;
-  top: 50%;
-  transform: translateY(-32%);
-  line-height: 1.3;
-  white-space: pre;
-  display: inline-block;
-  text-align: center;
-}
-.dcg-exppanel-container .dcg-mq-int .dcg-mq-non-leaf {
-  position: relative;
-}
-.dcg-exppanel-container .dcg-mq-int > big {
-  color: transparent;
+/* キーボードのapprox */
+.dcg-keypad-btn[dcg-command="~"] .dcg-mq-binary-operator,
+.dcg-keypad-btn[dcg-command=":"] .dcg-mq-binary-operator {
+  padding: 0 !important;
+  font-size: 0.9rem;
 }
 
 /* ΣΠの下に余白 */
-.dcg-mq-math-mode big {
-  margin-bottom: 0.2rem !important;
+span:not(.dcg-mq-int) > big {
+  margin-bottom: 0.12em !important;
 }
 
 /* ()内の上側の余白をなくす */

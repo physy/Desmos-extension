@@ -5,6 +5,7 @@ const DEFAULT_SETTINGS = {
   normalSizeSubscript: false,
   normalSizeSubscriptMinChars: 2,
   enhancedParentheses: false,
+  displayStyleIntegrals: true,
 };
 
 // 設定を読み込む
@@ -60,6 +61,7 @@ async function initializeUI() {
   normalSizeExpand.classList.toggle("visible", settings.normalSizeSubscript);
 
   document.getElementById("enhancedParentheses").checked = settings.enhancedParentheses;
+  document.getElementById("displayStyleIntegrals").checked = settings.displayStyleIntegrals;
 }
 
 // 設定変更イベントリスナー
@@ -73,6 +75,7 @@ function setupEventListeners() {
   const normalSizeExpand = document.getElementById("normalSizeSubscriptExpand");
   const normalSizeDetails = document.getElementById("normalSizeSubscriptDetails");
   const enhancedParenthesesCheckbox = document.getElementById("enhancedParentheses");
+  const displayStyleIntegralsCheckbox = document.getElementById("displayStyleIntegrals");
   const resetBtn = document.getElementById("resetBtn");
 
   uprightCheckbox.addEventListener("change", async () => {
@@ -124,6 +127,12 @@ function setupEventListeners() {
   enhancedParenthesesCheckbox.addEventListener("change", async () => {
     const settings = await loadSettings();
     settings.enhancedParentheses = enhancedParenthesesCheckbox.checked;
+    await saveSettings(settings);
+  });
+
+  displayStyleIntegralsCheckbox.addEventListener("change", async () => {
+    const settings = await loadSettings();
+    settings.displayStyleIntegrals = displayStyleIntegralsCheckbox.checked;
     await saveSettings(settings);
   });
 
