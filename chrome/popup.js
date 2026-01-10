@@ -5,6 +5,7 @@ const DEFAULT_SETTINGS = {
   normalSizeSubscript: false,
   normalSizeSubscriptMinChars: 2,
   enhancedParentheses: false,
+  enhancedParenthesesThickness: "normal",
   displayStyleIntegrals: true,
 };
 
@@ -51,6 +52,9 @@ async function initializeUI() {
   const normalSizeCheckbox = document.getElementById("normalSizeSubscript");
   const normalSizeSelect = document.getElementById("normalSizeSubscriptMinChars");
   const normalSizeExpand = document.getElementById("normalSizeSubscriptExpand");
+  const enhancedParenthesesCheckbox = document.getElementById("enhancedParentheses");
+  const enhancedParenthesesSelect = document.getElementById("enhancedParenthesesThickness");
+  const enhancedParenthesesExpand = document.getElementById("enhancedParenthesesExpand");
 
   uprightCheckbox.checked = settings.uprightSubscript;
   uprightSelect.value = settings.uprightSubscriptMinChars;
@@ -60,7 +64,10 @@ async function initializeUI() {
   normalSizeSelect.value = settings.normalSizeSubscriptMinChars;
   normalSizeExpand.classList.toggle("visible", settings.normalSizeSubscript);
 
-  document.getElementById("enhancedParentheses").checked = settings.enhancedParentheses;
+  enhancedParenthesesCheckbox.checked = settings.enhancedParentheses;
+  enhancedParenthesesSelect.value = settings.enhancedParenthesesThickness;
+  enhancedParenthesesExpand.classList.toggle("visible", settings.enhancedParentheses);
+
   document.getElementById("displayStyleIntegrals").checked = settings.displayStyleIntegrals;
 }
 
@@ -75,6 +82,9 @@ function setupEventListeners() {
   const normalSizeExpand = document.getElementById("normalSizeSubscriptExpand");
   const normalSizeDetails = document.getElementById("normalSizeSubscriptDetails");
   const enhancedParenthesesCheckbox = document.getElementById("enhancedParentheses");
+  const enhancedParenthesesSelect = document.getElementById("enhancedParenthesesThickness");
+  const enhancedParenthesesExpand = document.getElementById("enhancedParenthesesExpand");
+  const enhancedParenthesesDetails = document.getElementById("enhancedParenthesesDetails");
   const displayStyleIntegralsCheckbox = document.getElementById("displayStyleIntegrals");
   const resetBtn = document.getElementById("resetBtn");
 
@@ -127,6 +137,23 @@ function setupEventListeners() {
   enhancedParenthesesCheckbox.addEventListener("change", async () => {
     const settings = await loadSettings();
     settings.enhancedParentheses = enhancedParenthesesCheckbox.checked;
+    enhancedParenthesesExpand.classList.toggle("visible", enhancedParenthesesCheckbox.checked);
+    if (!enhancedParenthesesCheckbox.checked) {
+      enhancedParenthesesDetails.style.display = "none";
+      enhancedParenthesesExpand.classList.remove("expanded");
+    }
+    await saveSettings(settings);
+  });
+
+  enhancedParenthesesExpand.addEventListener("click", () => {
+    const isExpanded = enhancedParenthesesDetails.style.display !== "none";
+    enhancedParenthesesDetails.style.display = isExpanded ? "none" : "flex";
+    enhancedParenthesesExpand.classList.toggle("expanded", !isExpanded);
+  });
+
+  enhancedParenthesesSelect.addEventListener("change", async () => {
+    const settings = await loadSettings();
+    settings.enhancedParenthesesThickness = enhancedParenthesesSelect.value;
     await saveSettings(settings);
   });
 

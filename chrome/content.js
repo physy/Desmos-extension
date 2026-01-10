@@ -5,6 +5,7 @@ const DEFAULT_SETTINGS = {
   normalSizeSubscript: false,
   normalSizeSubscriptMinChars: 2,
   enhancedParentheses: false,
+  enhancedParenthesesThickness: "normal",
   displayStyleIntegrals: true,
 };
 
@@ -114,14 +115,26 @@ function applySettings() {
 
   // Enhanced parentheses
   if (currentSettings.enhancedParentheses) {
-    css += `
+    const thickness = currentSettings.enhancedParenthesesThickness || "normal";
+    if (thickness === "normal") {
+      css += `
 .dcg-mq-bracket-l.dcg-mq-paren svg[viewBox="3 0 106 186"] path {
-  d: path('M78 6 A68 101 0 0 0 81 180 c 2.2 1.2, 1 6, -3 3 A78 101 0 0 1 75 3 c 4 -3, 5.2 1.8, 3 3') !important;
+  d:  path("M78 6 A65 101 0 0 0 78 180 c 2.2 1.2, 1 6, -3 3 A78 101 0 0 1 75 3 c 4 -3, 5.2 1.8, 3 3") !important;
 }
 .dcg-mq-bracket-r.dcg-mq-paren svg[viewBox="3 0 106 186"] path {
-  d: path('M28 6 A68 101 0 0 1 25 180 c -2.2 1.2, -1 6, 3 3 A78 101 0 0 0 31 3 c -4 -3, -5.2 1.8, -3 3') !important;
+  d: path('M28 6 A65 101 0 0 1 28 180 c -2.2 1.2, -1 6, 3 3 A78 101 0 0 0 31 3 c -4 -3, -5.2 1.8, -3 3') !important;
 }
     `;
+    } else if (thickness === "thin") {
+      css += `
+.dcg-mq-bracket-l.dcg-mq-paren svg[viewBox="3 0 106 186"] path {
+  d:  path("M78 6 A69 101 0 0 0 78 180 c 2.2 1.2, 1 6, -3 3 A78 101 0 0 1 75 3 c 4 -3, 5.2 1.8, 3 3") !important;
+}
+.dcg-mq-bracket-r.dcg-mq-paren svg[viewBox="3 0 106 186"] path {
+  d: path('M28 6 A69 101 0 0 1 28 180 c -2.2 1.2, -1 6, 3 3 A78 101 0 0 0 31 3 c -4 -3, -5.2 1.8, -3 3') !important;
+}
+      `;
+    }
   }
 
   // Display style integrals

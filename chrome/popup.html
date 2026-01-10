@@ -63,15 +63,25 @@
         </label>
       </div>
 
-      <div class="setting-item">
-        <div class="setting-info">
-          <div class="setting-title">Enhanced parentheses</div>
-          <div class="setting-description">Improve the appearance of parentheses</div>
+      <div class="setting-group">
+        <div class="setting-item">
+          <button class="expand-btn" id="enhancedParenthesesExpand">▶</button>
+          <div class="setting-info">
+            <div class="setting-title">Enhanced parentheses</div>
+            <div class="setting-description">Improve the appearance of parentheses</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="enhancedParentheses" />
+            <span class="slider"></span>
+          </label>
         </div>
-        <label class="switch">
-          <input type="checkbox" id="enhancedParentheses" />
-          <span class="slider"></span>
-        </label>
+        <div class="setting-details" id="enhancedParenthesesDetails" style="display: none">
+          <label class="detail-label">Thickness:</label>
+          <select id="enhancedParenthesesThickness" class="setting-select">
+            <option value="normal" selected>Normal</option>
+            <option value="thin">Thin</option>
+          </select>
+        </div>
       </div>
 
       <div class="footer">
