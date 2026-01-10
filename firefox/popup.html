@@ -23,11 +23,13 @@
           </label>
         </div>
         <div class="setting-details" id="uprightSubscriptDetails" style="display: none">
-          <label class="detail-label">Minimum characters:</label>
-          <select id="uprightSubscriptMinChars" class="setting-select">
-            <option value="1">1+ chars</option>
-            <option value="2" selected>2+ chars</option>
-          </select>
+          <div class="detail-row">
+            <label class="detail-label">Minimum characters:</label>
+            <select id="uprightSubscriptMinChars" class="setting-select">
+              <option value="1">1+ chars</option>
+              <option value="2" selected>2+ chars</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -44,11 +46,20 @@
           </label>
         </div>
         <div class="setting-details" id="normalSizeSubscriptDetails" style="display: none">
-          <label class="detail-label">Minimum characters:</label>
-          <select id="normalSizeSubscriptMinChars" class="setting-select">
-            <option value="1">1+ chars</option>
-            <option value="2" selected>2+ chars</option>
-          </select>
+          <div class="detail-row">
+            <label class="detail-label">Minimum characters:</label>
+            <select id="normalSizeSubscriptMinChars" class="setting-select">
+              <option value="1">1+ chars</option>
+              <option value="2" selected>2+ chars</option>
+            </select>
+          </div>
+          <div class="warning-box">
+            <div class="detail-row">
+              <label class="detail-label">Apply while editing:</label>
+              <input type="checkbox" id="normalSizeSubscriptApplyWhileEditing" />
+            </div>
+            <div class="warning-text">⚠️ Enabling this may interfere with input</div>
+          </div>
         </div>
       </div>
 
@@ -63,15 +74,27 @@
         </label>
       </div>
 
-      <div class="setting-item">
-        <div class="setting-info">
-          <div class="setting-title">Enhanced parentheses</div>
-          <div class="setting-description">Improve the appearance of parentheses</div>
+      <div class="setting-group">
+        <div class="setting-item">
+          <button class="expand-btn" id="enhancedParenthesesExpand">▶</button>
+          <div class="setting-info">
+            <div class="setting-title">Enhanced parentheses</div>
+            <div class="setting-description">Improve the appearance of parentheses</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="enhancedParentheses" />
+            <span class="slider"></span>
+          </label>
         </div>
-        <label class="switch">
-          <input type="checkbox" id="enhancedParentheses" />
-          <span class="slider"></span>
-        </label>
+        <div class="setting-details" id="enhancedParenthesesDetails" style="display: none">
+          <div class="detail-row">
+            <label class="detail-label">Thickness:</label>
+            <select id="enhancedParenthesesThickness" class="setting-select">
+              <option value="normal" selected>Normal</option>
+              <option value="thin">Thin</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <div class="footer">

@@ -4,7 +4,9 @@ const DEFAULT_SETTINGS = {
   uprightSubscriptMinChars: 2,
   normalSizeSubscript: false,
   normalSizeSubscriptMinChars: 2,
+  normalSizeSubscriptApplyWhileEditing: false,
   enhancedParentheses: false,
+  enhancedParenthesesThickness: "normal",
   displayStyleIntegrals: true,
 };
 
@@ -67,22 +69,25 @@ function applySettings() {
   if (currentSettings.normalSizeSubscript) {
     const minChars = currentSettings.normalSizeSubscriptMinChars || 2;
     const nthType = `n + ${minChars}`;
+    const focusedCondition = currentSettings.normalSizeSubscriptApplyWhileEditing
+      ? ""
+      : ":not(.dcg-mq-focused)";
 
     css += `
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(${nthType})) {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode${focusedCondition} .dcg-mq-supsub:has(var:nth-of-type(${nthType})) {
   margin-bottom: 0 !important;
   vertical-align: baseline !important;
   display: inline-block !important;
   direction: rtl !important;
 }
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused)
-  .dcg-mq-supsub:has(var:nth-of-type(${nthType})):has(+ var) {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode${focusedCondition}
+  .dcg-mq-supsub:has(var:nth-of-type(${nthType})):has(+ :is(.dcg-mq-cursor, var)) {
   margin-right: 0.2em !important;
 }
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(${nthType})) .dcg-mq-sub {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode${focusedCondition} .dcg-mq-supsub:has(var:nth-of-type(${nthType})) .dcg-mq-sub {
   font-size: 111.111% !important;
 }
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(${nthType})) .dcg-mq-sub  var {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode${focusedCondition} .dcg-mq-supsub:has(var:nth-of-type(${nthType})) .dcg-mq-sub  var {
   font-family: "CustomRomanRegular", "CustomMath", "CustomRomanItalic" !important;
   font-style: normal !important;
   padding-right: 0 !important;
@@ -90,18 +95,19 @@ function applySettings() {
   margin-right: 0 !important;
   margin-left: 0 !important;
 }
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(${nthType})) .dcg-mq-sup {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode${focusedCondition} .dcg-mq-supsub:has(var:nth-of-type(${nthType})) .dcg-mq-sup {
   margin-bottom: 0.5em;
   direction: ltr;
   display: inline-block !important;
   vertical-align: text-bottom !important;
 }
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) .dcg-mq-supsub:has(var:nth-of-type(${nthType})) .dcg-mq-sub {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode${focusedCondition} .dcg-mq-supsub:has(var:nth-of-type(${nthType})) .dcg-mq-sub {
   direction: ltr;
   display: inline-block !important;
   float: none !important;
 }
-:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode:not(.dcg-mq-focused) var:has(+ .dcg-mq-supsub var:nth-of-type(${nthType})) {
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode${focusedCondition} var:has(+ .dcg-mq-supsub var:nth-of-type(${nthType})),
+:is(.dcg-exppanel-container, #intellisense-container) .dcg-mq-math-mode${focusedCondition} var:has(+ .dcg-mq-cursor + .dcg-mq-supsub var:nth-of-type(${nthType})) {
   font-family: "CustomRomanRegular", "CustomMath", "CustomRomanItalic" !important;
   font-style: initial !important;
   padding-right: 0 !important;
@@ -114,14 +120,26 @@ function applySettings() {
 
   // Enhanced parentheses
   if (currentSettings.enhancedParentheses) {
-    css += `
+    const thickness = currentSettings.enhancedParenthesesThickness || "normal";
+    if (thickness === "normal") {
+      css += `
 .dcg-mq-bracket-l.dcg-mq-paren svg[viewBox="3 0 106 186"] path {
-  d: path('M78 6 A68 101 0 0 0 81 180 c 2.2 1.2, 1 6, -3 3 A78 101 0 0 1 75 3 c 4 -3, 5.2 1.8, 3 3') !important;
+  d:  path("M78 6 A65 101 0 0 0 78 180 c 2.2 1.2, 1 6, -3 3 A78 101 0 0 1 75 3 c 4 -3, 5.2 1.8, 3 3") !important;
 }
 .dcg-mq-bracket-r.dcg-mq-paren svg[viewBox="3 0 106 186"] path {
-  d: path('M28 6 A68 101 0 0 1 25 180 c -2.2 1.2, -1 6, 3 3 A78 101 0 0 0 31 3 c -4 -3, -5.2 1.8, -3 3') !important;
+  d: path('M28 6 A65 101 0 0 1 28 180 c -2.2 1.2, -1 6, 3 3 A78 101 0 0 0 31 3 c -4 -3, -5.2 1.8, -3 3') !important;
 }
     `;
+    } else if (thickness === "thin") {
+      css += `
+.dcg-mq-bracket-l.dcg-mq-paren svg[viewBox="3 0 106 186"] path {
+  d:  path("M78 6 A69 101 0 0 0 78 180 c 2.2 1.2, 1 6, -3 3 A78 101 0 0 1 75 3 c 4 -3, 5.2 1.8, 3 3") !important;
+}
+.dcg-mq-bracket-r.dcg-mq-paren svg[viewBox="3 0 106 186"] path {
+  d: path('M28 6 A69 101 0 0 1 28 180 c -2.2 1.2, -1 6, 3 3 A78 101 0 0 0 31 3 c -4 -3, -5.2 1.8, -3 3') !important;
+}
+      `;
+    }
   }
 
   // Display style integrals

@@ -4,6 +4,7 @@ const DEFAULT_SETTINGS = {
   uprightSubscriptMinChars: 2,
   normalSizeSubscript: false,
   normalSizeSubscriptMinChars: 2,
+  normalSizeSubscriptApplyWhileEditing: false,
   enhancedParentheses: false,
   enhancedParenthesesThickness: "normal",
   displayStyleIntegrals: true,
@@ -63,6 +64,8 @@ async function initializeUI() {
   normalSizeCheckbox.checked = settings.normalSizeSubscript;
   normalSizeSelect.value = settings.normalSizeSubscriptMinChars;
   normalSizeExpand.classList.toggle("visible", settings.normalSizeSubscript);
+  document.getElementById("normalSizeSubscriptApplyWhileEditing").checked =
+    settings.normalSizeSubscriptApplyWhileEditing;
 
   enhancedParenthesesCheckbox.checked = settings.enhancedParentheses;
   enhancedParenthesesSelect.value = settings.enhancedParenthesesThickness;
@@ -79,6 +82,9 @@ function setupEventListeners() {
   const uprightDetails = document.getElementById("uprightSubscriptDetails");
   const normalSizeCheckbox = document.getElementById("normalSizeSubscript");
   const normalSizeSelect = document.getElementById("normalSizeSubscriptMinChars");
+  const normalSizeApplyWhileEditingCheckbox = document.getElementById(
+    "normalSizeSubscriptApplyWhileEditing"
+  );
   const normalSizeExpand = document.getElementById("normalSizeSubscriptExpand");
   const normalSizeDetails = document.getElementById("normalSizeSubscriptDetails");
   const enhancedParenthesesCheckbox = document.getElementById("enhancedParentheses");
@@ -131,6 +137,12 @@ function setupEventListeners() {
   normalSizeSelect.addEventListener("change", async () => {
     const settings = await loadSettings();
     settings.normalSizeSubscriptMinChars = parseInt(normalSizeSelect.value);
+    await saveSettings(settings);
+  });
+
+  normalSizeApplyWhileEditingCheckbox.addEventListener("change", async () => {
+    const settings = await loadSettings();
+    settings.normalSizeSubscriptApplyWhileEditing = normalSizeApplyWhileEditingCheckbox.checked;
     await saveSettings(settings);
   });
 
