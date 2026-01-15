@@ -187,7 +187,7 @@ function applySettings() {
   if (currentSettings.colonWithSpace) {
     const width = currentSettings.colonWithSpaceWidth || 500;
     css += `
-.dcg-mq-math-mode .dcg-mq-root-block {
+.dcg-exppanel-container .dcg-mq-math-mode .dcg-mq-root-block {
   font-family: "Colon${width}", "CustomMath" !important;
 }
     `;
@@ -197,7 +197,7 @@ function applySettings() {
   if (currentSettings.commaWithSpace) {
     const margin = currentSettings.commaWithSpaceMargin || 0.2;
     css += `
-.dcg-mq-comma {
+.dcg-exppanel-container .dcg-mq-comma {
   margin-right: ${margin}em !important;
 }
     `;
