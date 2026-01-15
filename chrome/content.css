@@ -45,6 +45,7 @@
 /* \mathit\mathrm\mathbf\mathsf\mathtt には当てない */
 .dcg-mq-math-mode *:not(.dcg-mq-font) > var:not(.dcg-mq-operator-name) {
   font-family: "CustomRomanItalic", "CustomMath";
+  line-height: 0.7 !important; /* ()内での変数の縦の大きさを調整 */
   font-style: italic;
 }
 .dcg-mq-math-mode *:not(.dcg-mq-font) > var:not(.dcg-mq-operator-name, .dcg-mq-f) {
@@ -94,9 +95,4 @@
 /* ΣΠの下に余白 */
 span:not(.dcg-mq-int) > big {
   margin-bottom: 0.12em !important;
-}
-
-/* ()内の上側の余白をなくす */
-.dcg-mq-math-mode .dcg-mq-bracket-middle {
-  margin-top: 0 !important;
 }
