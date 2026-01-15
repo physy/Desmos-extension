@@ -23,6 +23,25 @@
   font-feature-settings: "liga" 0, "clig" 0;
 }
 
+@font-face {
+  font-family: "Colon400";
+  src: url(chrome-extension://__MSG_@@extension_id__/resource/Colon400.woff2) format("woff2");
+  unicode-range: U+003A;
+  font-weight: normal;
+}
+@font-face {
+  font-family: "Colon500";
+  src: url(chrome-extension://__MSG_@@extension_id__/resource/Colon500.woff2) format("woff2");
+  unicode-range: U+003A;
+  font-weight: normal;
+}
+@font-face {
+  font-family: "Colon600";
+  src: url(chrome-extension://__MSG_@@extension_id__/resource/Colon600.woff2) format("woff2");
+  unicode-range: U+003A;
+  font-weight: normal;
+}
+
 /* \mathit\mathrm\mathbf\mathsf\mathtt には当てない */
 .dcg-mq-math-mode *:not(.dcg-mq-font) > var:not(.dcg-mq-operator-name) {
   font-family: "CustomRomanItalic", "CustomMath";
