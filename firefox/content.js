@@ -8,6 +8,10 @@ const DEFAULT_SETTINGS = {
   enhancedParentheses: false,
   enhancedParenthesesThickness: "normal",
   displayStyleIntegrals: true,
+  colonWithSpace: false,
+  colonWithSpaceWidth: 500,
+  commaWithSpace: false,
+  commaWithSpaceMargin: 0.2,
 };
 
 // 現在の設定
@@ -175,6 +179,26 @@ function applySettings() {
 }
 .dcg-exppanel-container .dcg-mq-int > .dcg-mq-supsub > .dcg-mq-sup {
   margin-left: 0.25em !important;
+}
+    `;
+  }
+
+  // Colon with space
+  if (currentSettings.colonWithSpace) {
+    const width = currentSettings.colonWithSpaceWidth || 500;
+    css += `
+.dcg-mq-math-mode .dcg-mq-root-block {
+  font-family: "Colon${width}", "CustomMath" !important;
+}
+    `;
+  }
+
+  // Comma with space
+  if (currentSettings.commaWithSpace) {
+    const margin = currentSettings.commaWithSpaceMargin || 0.2;
+    css += `
+.dcg-mq-comma {
+  margin-right: ${margin}em !important;
 }
     `;
   }

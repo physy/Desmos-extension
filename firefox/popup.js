@@ -8,6 +8,10 @@ const DEFAULT_SETTINGS = {
   enhancedParentheses: false,
   enhancedParenthesesThickness: "normal",
   displayStyleIntegrals: true,
+  colonWithSpace: false,
+  colonWithSpaceWidth: 500,
+  commaWithSpace: false,
+  commaWithSpaceMargin: 0.2,
 };
 
 // 設定を読み込む
@@ -56,6 +60,12 @@ async function initializeUI() {
   const enhancedParenthesesCheckbox = document.getElementById("enhancedParentheses");
   const enhancedParenthesesSelect = document.getElementById("enhancedParenthesesThickness");
   const enhancedParenthesesExpand = document.getElementById("enhancedParenthesesExpand");
+  const colonWithSpaceCheckbox = document.getElementById("colonWithSpace");
+  const colonWithSpaceSelect = document.getElementById("colonWithSpaceWidth");
+  const colonWithSpaceExpand = document.getElementById("colonWithSpaceExpand");
+  const commaWithSpaceCheckbox = document.getElementById("commaWithSpace");
+  const commaWithSpaceSelect = document.getElementById("commaWithSpaceMargin");
+  const commaWithSpaceExpand = document.getElementById("commaWithSpaceExpand");
 
   uprightCheckbox.checked = settings.uprightSubscript;
   uprightSelect.value = settings.uprightSubscriptMinChars;
@@ -70,6 +80,14 @@ async function initializeUI() {
   enhancedParenthesesCheckbox.checked = settings.enhancedParentheses;
   enhancedParenthesesSelect.value = settings.enhancedParenthesesThickness;
   enhancedParenthesesExpand.classList.toggle("visible", settings.enhancedParentheses);
+
+  colonWithSpaceCheckbox.checked = settings.colonWithSpace;
+  colonWithSpaceSelect.value = settings.colonWithSpaceWidth;
+  colonWithSpaceExpand.classList.toggle("visible", settings.colonWithSpace);
+
+  commaWithSpaceCheckbox.checked = settings.commaWithSpace;
+  commaWithSpaceSelect.value = settings.commaWithSpaceMargin;
+  commaWithSpaceExpand.classList.toggle("visible", settings.commaWithSpace);
 
   document.getElementById("displayStyleIntegrals").checked = settings.displayStyleIntegrals;
 }
@@ -91,6 +109,14 @@ function setupEventListeners() {
   const enhancedParenthesesSelect = document.getElementById("enhancedParenthesesThickness");
   const enhancedParenthesesExpand = document.getElementById("enhancedParenthesesExpand");
   const enhancedParenthesesDetails = document.getElementById("enhancedParenthesesDetails");
+  const colonWithSpaceCheckbox = document.getElementById("colonWithSpace");
+  const colonWithSpaceSelect = document.getElementById("colonWithSpaceWidth");
+  const colonWithSpaceExpand = document.getElementById("colonWithSpaceExpand");
+  const colonWithSpaceDetails = document.getElementById("colonWithSpaceDetails");
+  const commaWithSpaceCheckbox = document.getElementById("commaWithSpace");
+  const commaWithSpaceSelect = document.getElementById("commaWithSpaceMargin");
+  const commaWithSpaceExpand = document.getElementById("commaWithSpaceExpand");
+  const commaWithSpaceDetails = document.getElementById("commaWithSpaceDetails");
   const displayStyleIntegralsCheckbox = document.getElementById("displayStyleIntegrals");
   const resetBtn = document.getElementById("resetBtn");
 
@@ -166,6 +192,52 @@ function setupEventListeners() {
   enhancedParenthesesSelect.addEventListener("change", async () => {
     const settings = await loadSettings();
     settings.enhancedParenthesesThickness = enhancedParenthesesSelect.value;
+    await saveSettings(settings);
+  });
+
+  colonWithSpaceCheckbox.addEventListener("change", async () => {
+    const settings = await loadSettings();
+    settings.colonWithSpace = colonWithSpaceCheckbox.checked;
+    colonWithSpaceExpand.classList.toggle("visible", colonWithSpaceCheckbox.checked);
+    if (!colonWithSpaceCheckbox.checked) {
+      colonWithSpaceDetails.style.display = "none";
+      colonWithSpaceExpand.classList.remove("expanded");
+    }
+    await saveSettings(settings);
+  });
+
+  colonWithSpaceExpand.addEventListener("click", () => {
+    const isExpanded = colonWithSpaceDetails.style.display !== "none";
+    colonWithSpaceDetails.style.display = isExpanded ? "none" : "flex";
+    colonWithSpaceExpand.classList.toggle("expanded", !isExpanded);
+  });
+
+  colonWithSpaceSelect.addEventListener("change", async () => {
+    const settings = await loadSettings();
+    settings.colonWithSpaceWidth = parseInt(colonWithSpaceSelect.value);
+    await saveSettings(settings);
+  });
+
+  commaWithSpaceCheckbox.addEventListener("change", async () => {
+    const settings = await loadSettings();
+    settings.commaWithSpace = commaWithSpaceCheckbox.checked;
+    commaWithSpaceExpand.classList.toggle("visible", commaWithSpaceCheckbox.checked);
+    if (!commaWithSpaceCheckbox.checked) {
+      commaWithSpaceDetails.style.display = "none";
+      commaWithSpaceExpand.classList.remove("expanded");
+    }
+    await saveSettings(settings);
+  });
+
+  commaWithSpaceExpand.addEventListener("click", () => {
+    const isExpanded = commaWithSpaceDetails.style.display !== "none";
+    commaWithSpaceDetails.style.display = isExpanded ? "none" : "flex";
+    commaWithSpaceExpand.classList.toggle("expanded", !isExpanded);
+  });
+
+  commaWithSpaceSelect.addEventListener("change", async () => {
+    const settings = await loadSettings();
+    settings.commaWithSpaceMargin = parseFloat(commaWithSpaceSelect.value);
     await saveSettings(settings);
   });
 
