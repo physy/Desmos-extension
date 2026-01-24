@@ -11,7 +11,9 @@
   font-weight: normal;
   font-style: italic;
   font-variant-ligatures: none;
-  font-feature-settings: "liga" 0, "clig" 0;
+  font-feature-settings:
+    "liga" 0,
+    "clig" 0;
 }
 @font-face {
   font-family: "CustomRomanRegular";
@@ -20,7 +22,9 @@
   font-weight: normal;
   font-style: normal;
   font-variant-ligatures: none;
-  font-feature-settings: "liga" 0, "clig" 0;
+  font-feature-settings:
+    "liga" 0,
+    "clig" 0;
 }
 
 @font-face {
@@ -54,7 +58,7 @@
   padding-right: 0.05em !important; /* margin-rightはfの右余白と競合する */
   margin-left: -0.05em !important; /* paddingはネガティブマージン不可能 */
 }
-.dcg-graph-outer var {
+.dcg-graph-outer .dcg-poi-label:not(.dcg-editable-label):not(.dcg-show-border) var {
   /* ラベルの文字が上下にズレてしまうのを防ぐための調整 */
   vertical-align: 0.1em !important;
 }
@@ -75,6 +79,9 @@
 .dcg-mq-math-mode .dcg-mq-nonSymbola:not(.dcg-mq-operator-name) {
   font-family: "CustomMath" !important;
   font-style: italic !important;
+  display: inline-block !important;
+  padding-right: 0.05em !important;
+  margin-left: -0.05em !important;
 }
 /* percent */
 .dcg-mq-math-mode .dcg-mq-nonSymbola.dcg-mq-operator-name {
