@@ -1,16 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Desmos Font Settings</title>
+    <title>Settings</title>
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
     <div class="container">
-      <h2>Font Settings (beta)</h2>
+      <h2>Settings (beta)</h2>
 
-      <div class="setting-group">
+      <div id="settings-container"></div>
+
+      <!-- <div class="setting-group">
         <div class="setting-item">
           <button class="expand-btn" id="uprightSubscriptExpand">▶</button>
           <div class="setting-info" title="Display subscripts in upright style">
@@ -140,13 +142,16 @@
             </select>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <div class="footer">
+        <!-- <button id="exportBtn" class="export-btn">Export Settings</button>
+        <button id="importBtn" class="import-btn">Import Settings</button> -->
         <button id="resetBtn" class="reset-btn">Reset to Default</button>
       </div>
     </div>
 
+    <script src="settings-config.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-// デフォルト設定
+// デフォルト設定を生成（settings-config.jsがない場合のフォールバック）
 const DEFAULT_SETTINGS = {
   uprightSubscript: false,
   uprightSubscriptMinChars: 2,
@@ -20,12 +20,46 @@ let currentSettings = { ...DEFAULT_SETTINGS };
 // 設定を読み込んで適用
 async function loadAndApplySettings() {
   try {
-    const result = await chrome.storage.sync.get(DEFAULT_SETTINGS);
-    currentSettings = result;
+    // まず新しいJSON形式を試みる
+    const result = await chrome.storage.sync.get("settings");
+    if (result.settings) {
+      currentSettings = { ...DEFAULT_SETTINGS, ...result.settings };
+      applySettings();
+      return;
+    }
+
+    // 新しい形式がない場合、旧形式からの移行を試みる
+    const oldSettings = await chrome.storage.sync.get(null); // すべてのキーを取得
+    const migratedSettings = {};
+    let hasMigration = false;
+
+    // DEFAULT_SETTINGSのキーが旧形式で存在するかチェック
+    for (const key in DEFAULT_SETTINGS) {
+      if (oldSettings.hasOwnProperty(key) && key !== "settings") {
+        migratedSettings[key] = oldSettings[key];
+        hasMigration = true;
+      }
+    }
+
+    if (hasMigration) {
+      // 旧形式から移行
+      currentSettings = { ...DEFAULT_SETTINGS, ...migratedSettings };
+      await chrome.storage.sync.set({ settings: currentSettings });
+
+      // 旧形式のキーを削除
+      const keysToRemove = Object.keys(DEFAULT_SETTINGS);
+      await chrome.storage.sync.remove(keysToRemove);
+
+      console.log("Settings migrated from old format to new JSON format");
+    } else {
+      currentSettings = { ...DEFAULT_SETTINGS };
+    }
+
     applySettings();
   } catch (error) {
     console.error("Failed to load settings:", error);
-    applySettings(); // デフォルト設定を適用
+    currentSettings = { ...DEFAULT_SETTINGS };
+    applySettings();
   }
 }
 
