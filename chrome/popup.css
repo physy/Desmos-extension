@@ -150,6 +150,31 @@ input:checked + .slider:before {
   display: flex;
   align-items: center;
   gap: 10px;
+  position: relative;
+}
+
+.detail-reset-btn {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 3px;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+  line-height: 1;
+  display: none;
+}
+
+.detail-reset-btn:hover {
+  background-color: #f3f3f3;
+  color: #007bff;
+}
+
+.detail-reset-btn:active {
+  transform: scale(0.95);
 }
 
 .detail-row input[type="checkbox"] {
@@ -237,8 +262,26 @@ input:checked + .slider:before {
   background-color: #f8f9fa;
 }
 
+.setting-color {
+  width: 60px;
+  height: 32px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.setting-color:hover {
+  border-color: #007bff;
+}
+
+.setting-color:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
 .footer {
-  margin-top: 20px;
   text-align: center;
   padding-top: 15px;
   border-top: 1px solid #e9ecef;
@@ -265,7 +308,6 @@ input:checked + .slider:before {
 
 /* カテゴリスタイル */
 .category {
-  margin-bottom: 10px;
   position: relative;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
@@ -276,7 +318,7 @@ input:checked + .slider:before {
   top: 40px;
   bottom: 5px;
   content: "";
-  border-left: 1px solid rgba(0, 0, 0, 0.2);
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
   animation: dcg-fadeIn 0.3s;
 }
 
@@ -334,30 +376,6 @@ input:checked + .slider:before {
 }
 
 .category-content {
-  padding-left: 20px;
+  padding-left: 24px;
   margin-top: 4px;
-}
-
-/* エクスポート/インポートボタン */
-.export-btn,
-.import-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 11px;
-  transition: background-color 0.2s;
-  margin-right: 5px;
-}
-
-.export-btn:hover,
-.import-btn:hover {
-  background-color: #0056b3;
-}
-
-.export-btn:active,
-.import-btn:active {
-  transform: scale(0.98);
 }

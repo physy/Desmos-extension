@@ -14,7 +14,7 @@ const SETTINGS_CONFIG = {
           details: [
             {
               id: "uprightSubscriptMinChars",
-              label: "Minimum characters",
+              label: "Min chars",
               type: "select",
               options: [
                 { value: 1, label: "1+ chars" },
@@ -33,7 +33,7 @@ const SETTINGS_CONFIG = {
           details: [
             {
               id: "normalSizeSubscriptMinChars",
-              label: "Minimum characters",
+              label: "Min chars",
               type: "select",
               options: [
                 { value: 1, label: "1+ chars" },
@@ -127,7 +127,35 @@ const SETTINGS_CONFIG = {
       id: "ui",
       title: "UI",
       settings: [
-        // 実装予定
+        {
+          id: "transparentIcons",
+          title: "Transparent icons",
+          description: "Make UI icons and buttons transparent with blur effect",
+          type: "toggle",
+          defaultValue: false,
+        },
+        {
+          id: "compactHeader",
+          title: "Compact header",
+          description: "Make header and UI elements more compact",
+          type: "toggle",
+          defaultValue: false,
+        },
+        {
+          id: "customBackground",
+          title: "Custom background",
+          description: "Change background color of UI elements",
+          type: "toggle",
+          defaultValue: false,
+          details: [
+            {
+              id: "customBackgroundColor",
+              label: "Color",
+              type: "color",
+              defaultValue: "#f6f9fd",
+            },
+          ],
+        },
       ],
     },
   ],

@@ -160,6 +160,39 @@ function generateUI() {
             });
             detailRow.appendChild(select);
 
+            const resetBtn = document.createElement("button");
+            resetBtn.className = "detail-reset-btn";
+            resetBtn.id = `${detail.id}Reset`;
+            resetBtn.textContent = "↺";
+            resetBtn.title = "Reset to default";
+            resetBtn.style.display = "none";
+            detailRow.appendChild(resetBtn);
+
+            detailsDiv.appendChild(detailRow);
+          } else if (detail.type === "color") {
+            const detailRow = document.createElement("div");
+            detailRow.className = "detail-row";
+
+            const label = document.createElement("label");
+            label.className = "detail-label";
+            label.textContent = detail.label + ":";
+            detailRow.appendChild(label);
+
+            const colorInput = document.createElement("input");
+            colorInput.type = "color";
+            colorInput.id = detail.id;
+            colorInput.className = "setting-color";
+            colorInput.value = detail.defaultValue;
+            detailRow.appendChild(colorInput);
+
+            const resetBtn = document.createElement("button");
+            resetBtn.className = "detail-reset-btn";
+            resetBtn.id = `${detail.id}Reset`;
+            resetBtn.textContent = "↺";
+            resetBtn.title = "Reset to default";
+            resetBtn.style.display = "none";
+            detailRow.appendChild(resetBtn);
+
             detailsDiv.appendChild(detailRow);
           } else if (detail.type === "checkbox") {
             const warningBox = document.createElement("div");
@@ -243,8 +276,14 @@ async function initializeUI() {
         setting.details.forEach((detail) => {
           const element = document.getElementById(detail.id);
           if (element) {
-            if (detail.type === "select") {
+            if (detail.type === "select" || detail.type === "color") {
               element.value = settings[detail.id];
+              // リセットボタンの表示制御
+              const resetBtn = document.getElementById(`${detail.id}Reset`);
+              if (resetBtn) {
+                const isDifferent = settings[detail.id] != detail.defaultValue;
+                resetBtn.style.display = isDifferent ? "block" : "none";
+              }
             } else if (detail.type === "checkbox") {
               element.checked = settings[detail.id];
             }
@@ -277,56 +316,45 @@ function setupEventListeners() {
           if (element) {
             element.addEventListener("change", async () => {
               const settings = await loadSettings();
-              if (detail.type === "select") {
+              if (detail.type === "select" || detail.type === "color") {
                 const value = element.value;
                 settings[detail.id] = isNaN(value) ? value : parseFloat(value);
+                // リセットボタンの表示制御
+                const resetBtn = document.getElementById(`${detail.id}Reset`);
+                if (resetBtn) {
+                  const isDifferent = element.value != detail.defaultValue;
+                  resetBtn.style.display = isDifferent ? "block" : "none";
+                }
               } else if (detail.type === "checkbox") {
                 settings[detail.id] = element.checked;
               }
               await saveSettings(settings);
             });
           }
+
+          // リセットボタンのイベントリスナー
+          const resetBtn = document.getElementById(`${detail.id}Reset`);
+          if (resetBtn) {
+            resetBtn.addEventListener("click", async (e) => {
+              e.stopPropagation();
+              const settings = await loadSettings();
+              settings[detail.id] = detail.defaultValue;
+              await saveSettings(settings);
+
+              const element = document.getElementById(detail.id);
+              if (element) {
+                if (detail.type === "select" || detail.type === "color") {
+                  element.value = detail.defaultValue;
+                } else if (detail.type === "checkbox") {
+                  element.checked = detail.defaultValue;
+                }
+              }
+              resetBtn.style.display = "none";
+            });
+          }
         });
       }
     });
-  });
-
-  // エクスポート
-  document.getElementById("exportBtn").addEventListener("click", async () => {
-    const settings = await loadSettings();
-    const dataStr = JSON.stringify(settings, null, 2);
-    const dataBlob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "desmos-extension-settings.json";
-    link.click();
-    URL.revokeObjectURL(url);
-  });
-
-  // インポート
-  document.getElementById("importBtn").addEventListener("click", () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "application/json";
-    input.onchange = async (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-          try {
-            const importedSettings = JSON.parse(event.target.result);
-            await saveSettings(importedSettings);
-            await initializeUI();
-          } catch (error) {
-            console.error("Failed to import settings:", error);
-            alert("Failed to import settings. Please check the file format.");
-          }
-        };
-        reader.readAsText(file);
-      }
-    };
-    input.click();
   });
 
   // リセット
