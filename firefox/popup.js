@@ -1,24 +1,42 @@
-// デフォルト設定
-const DEFAULT_SETTINGS = {
-  uprightSubscript: false,
-  uprightSubscriptMinChars: 2,
-  normalSizeSubscript: false,
-  normalSizeSubscriptMinChars: 2,
-  normalSizeSubscriptApplyWhileEditing: false,
-  enhancedParentheses: false,
-  enhancedParenthesesThickness: "normal",
-  displayStyleIntegrals: true,
-  colonWithSpace: false,
-  colonWithSpaceWidth: 500,
-  commaWithSpace: false,
-  commaWithSpaceMargin: 0.2,
-};
+// デフォルト設定を生成
+const DEFAULT_SETTINGS = generateDefaultSettings();
 
 // 設定を読み込む
 async function loadSettings() {
   try {
-    const result = await chrome.storage.sync.get(DEFAULT_SETTINGS);
-    return result;
+    // まず新しいJSON形式を試みる
+    const result = await chrome.storage.sync.get("settings");
+    if (result.settings) {
+      return { ...DEFAULT_SETTINGS, ...result.settings };
+    }
+
+    // 新しい形式がない場合、旧形式からの移行を試みる
+    const oldSettings = await chrome.storage.sync.get(null); // すべてのキーを取得
+    const migratedSettings = {};
+    let hasMigration = false;
+
+    // DEFAULT_SETTINGSのキーが旧形式で存在するかチェック
+    for (const key in DEFAULT_SETTINGS) {
+      if (oldSettings.hasOwnProperty(key) && key !== "settings") {
+        migratedSettings[key] = oldSettings[key];
+        hasMigration = true;
+      }
+    }
+
+    if (hasMigration) {
+      // 旧形式から移行
+      const finalSettings = { ...DEFAULT_SETTINGS, ...migratedSettings };
+      await chrome.storage.sync.set({ settings: finalSettings });
+
+      // 旧形式のキーを削除
+      const keysToRemove = Object.keys(DEFAULT_SETTINGS);
+      await chrome.storage.sync.remove(keysToRemove);
+
+      console.log("Settings migrated from old format to new JSON format");
+      return finalSettings;
+    }
+
+    return DEFAULT_SETTINGS;
   } catch (error) {
     console.error("Failed to load settings:", error);
     return DEFAULT_SETTINGS;
@@ -28,7 +46,8 @@ async function loadSettings() {
 // 設定を保存する
 async function saveSettings(settings) {
   try {
-    await chrome.storage.sync.set(settings);
+    // JSON形式で保存
+    await chrome.storage.sync.set({ settings: settings });
     // 全てのDesmosタブに設定変更を通知
     const tabs = await chrome.tabs.query({ url: "*://www.desmos.com/*" });
     for (const tab of tabs) {
@@ -38,7 +57,6 @@ async function saveSettings(settings) {
           settings: settings,
         });
       } catch (error) {
-        // タブがまだ読み込み中や無効な場合のエラーを無視
         console.log("Could not send message to tab:", tab.id);
       }
     }
@@ -47,207 +65,300 @@ async function saveSettings(settings) {
   }
 }
 
-// UIを初期化
-async function initializeUI() {
-  const settings = await loadSettings();
+// UIを動的生成
+function generateUI() {
+  const container = document.getElementById("settings-container");
+  container.innerHTML = "";
 
-  const uprightCheckbox = document.getElementById("uprightSubscript");
-  const uprightSelect = document.getElementById("uprightSubscriptMinChars");
-  const uprightExpand = document.getElementById("uprightSubscriptExpand");
-  const normalSizeCheckbox = document.getElementById("normalSizeSubscript");
-  const normalSizeSelect = document.getElementById("normalSizeSubscriptMinChars");
-  const normalSizeExpand = document.getElementById("normalSizeSubscriptExpand");
-  const enhancedParenthesesCheckbox = document.getElementById("enhancedParentheses");
-  const enhancedParenthesesSelect = document.getElementById("enhancedParenthesesThickness");
-  const enhancedParenthesesExpand = document.getElementById("enhancedParenthesesExpand");
-  const colonWithSpaceCheckbox = document.getElementById("colonWithSpace");
-  const colonWithSpaceSelect = document.getElementById("colonWithSpaceWidth");
-  const colonWithSpaceExpand = document.getElementById("colonWithSpaceExpand");
-  const commaWithSpaceCheckbox = document.getElementById("commaWithSpace");
-  const commaWithSpaceSelect = document.getElementById("commaWithSpaceMargin");
-  const commaWithSpaceExpand = document.getElementById("commaWithSpaceExpand");
+  SETTINGS_CONFIG.categories.forEach((category) => {
+    // カテゴリヘッダー
+    const categoryDiv = document.createElement("div");
+    categoryDiv.className = "category";
 
-  uprightCheckbox.checked = settings.uprightSubscript;
-  uprightSelect.value = settings.uprightSubscriptMinChars;
-  uprightExpand.classList.toggle("visible", settings.uprightSubscript);
+    const categoryHeader = document.createElement("div");
+    categoryHeader.className = "category-header";
+    categoryHeader.innerHTML = `
+      <button class="category-expand-btn">▶</button>
+      <span class="category-title">${category.title}</span>
+    `;
+    categoryDiv.appendChild(categoryHeader);
 
-  normalSizeCheckbox.checked = settings.normalSizeSubscript;
-  normalSizeSelect.value = settings.normalSizeSubscriptMinChars;
-  normalSizeExpand.classList.toggle("visible", settings.normalSizeSubscript);
-  document.getElementById("normalSizeSubscriptApplyWhileEditing").checked =
-    settings.normalSizeSubscriptApplyWhileEditing;
+    const categoryContent = document.createElement("div");
+    categoryContent.className = "category-content";
+    categoryContent.style.display = "none";
 
-  enhancedParenthesesCheckbox.checked = settings.enhancedParentheses;
-  enhancedParenthesesSelect.value = settings.enhancedParenthesesThickness;
-  enhancedParenthesesExpand.classList.toggle("visible", settings.enhancedParentheses);
+    // 各設定項目
+    category.settings.forEach((setting) => {
+      const settingGroup = document.createElement("div");
+      settingGroup.className = "setting-group";
 
-  colonWithSpaceCheckbox.checked = settings.colonWithSpace;
-  colonWithSpaceSelect.value = settings.colonWithSpaceWidth;
-  colonWithSpaceExpand.classList.toggle("visible", settings.colonWithSpace);
+      const settingItem = document.createElement("div");
+      settingItem.className = "setting-item clickable";
 
-  commaWithSpaceCheckbox.checked = settings.commaWithSpace;
-  commaWithSpaceSelect.value = settings.commaWithSpaceMargin;
-  commaWithSpaceExpand.classList.toggle("visible", settings.commaWithSpace);
+      const hasDetails = setting.details && setting.details.length > 0;
+      const expandBtn = document.createElement("button");
+      expandBtn.className = "expand-btn visible";
+      expandBtn.id = `${setting.id}Expand`;
+      expandBtn.textContent = "▶";
+      settingItem.appendChild(expandBtn);
 
-  document.getElementById("displayStyleIntegrals").checked = settings.displayStyleIntegrals;
+      const settingInfo = document.createElement("div");
+      settingInfo.className = "setting-info";
+      settingInfo.title = setting.description;
+      settingInfo.innerHTML = `<div class="setting-title">${setting.title}</div>`;
+      settingItem.appendChild(settingInfo);
+
+      const switchLabel = document.createElement("label");
+      switchLabel.className = "switch";
+      switchLabel.innerHTML = `
+        <input type="checkbox" id="${setting.id}" />
+        <span class="slider"></span>
+      `;
+      switchLabel.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+      settingItem.appendChild(switchLabel);
+
+      settingGroup.appendChild(settingItem);
+
+      // 詳細設定
+      const detailsDiv = document.createElement("div");
+      detailsDiv.className = "setting-details";
+      detailsDiv.id = `${setting.id}Details`;
+      detailsDiv.style.display = "none";
+
+      // 説明文を追加
+      if (setting.description) {
+        const descDiv = document.createElement("div");
+        descDiv.className = "setting-description";
+        descDiv.textContent = setting.description;
+        detailsDiv.appendChild(descDiv);
+      }
+
+      if (hasDetails) {
+        setting.details.forEach((detail) => {
+          if (detail.type === "select") {
+            const detailRow = document.createElement("div");
+            detailRow.className = "detail-row";
+
+            const label = document.createElement("label");
+            label.className = "detail-label";
+            label.textContent = detail.label + ":";
+            detailRow.appendChild(label);
+
+            const select = document.createElement("select");
+            select.id = detail.id;
+            select.className = "setting-select";
+            detail.options.forEach((option) => {
+              const optionEl = document.createElement("option");
+              optionEl.value = option.value;
+              optionEl.textContent = option.label;
+              if (option.value === detail.defaultValue) {
+                optionEl.selected = true;
+              }
+              select.appendChild(optionEl);
+            });
+            detailRow.appendChild(select);
+
+            const resetBtn = document.createElement("button");
+            resetBtn.className = "detail-reset-btn";
+            resetBtn.id = `${detail.id}Reset`;
+            resetBtn.textContent = "↺";
+            resetBtn.title = "Reset to default";
+            resetBtn.style.display = "none";
+            detailRow.appendChild(resetBtn);
+
+            detailsDiv.appendChild(detailRow);
+          } else if (detail.type === "color") {
+            const detailRow = document.createElement("div");
+            detailRow.className = "detail-row";
+
+            const label = document.createElement("label");
+            label.className = "detail-label";
+            label.textContent = detail.label + ":";
+            detailRow.appendChild(label);
+
+            const colorInput = document.createElement("input");
+            colorInput.type = "color";
+            colorInput.id = detail.id;
+            colorInput.className = "setting-color";
+            colorInput.value = detail.defaultValue;
+            detailRow.appendChild(colorInput);
+
+            const resetBtn = document.createElement("button");
+            resetBtn.className = "detail-reset-btn";
+            resetBtn.id = `${detail.id}Reset`;
+            resetBtn.textContent = "↺";
+            resetBtn.title = "Reset to default";
+            resetBtn.style.display = "none";
+            detailRow.appendChild(resetBtn);
+
+            detailsDiv.appendChild(detailRow);
+          } else if (detail.type === "checkbox") {
+            const warningBox = document.createElement("div");
+            warningBox.className = "warning-box";
+
+            const detailRow = document.createElement("div");
+            detailRow.className = "detail-row";
+
+            const label = document.createElement("label");
+            label.className = "detail-label";
+            label.textContent = detail.label + ":";
+            detailRow.appendChild(label);
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.id = detail.id;
+            detailRow.appendChild(checkbox);
+
+            warningBox.appendChild(detailRow);
+
+            if (detail.warning) {
+              const warningText = document.createElement("div");
+              warningText.className = "warning-text";
+              warningText.textContent = detail.warning;
+              warningBox.appendChild(warningText);
+            }
+
+            detailsDiv.appendChild(warningBox);
+          }
+        });
+      }
+
+      settingGroup.appendChild(detailsDiv);
+
+      // 設定項目全体をクリック可能に
+      settingItem.addEventListener("click", () => {
+        const isExpanded = detailsDiv.style.display !== "none";
+        detailsDiv.style.display = isExpanded ? "none" : "flex";
+        expandBtn.classList.toggle("expanded", !isExpanded);
+      });
+
+      categoryContent.appendChild(settingGroup);
+    });
+
+    categoryDiv.appendChild(categoryContent);
+    container.appendChild(categoryDiv);
+  });
 }
 
-// 設定変更イベントリスナー
+// UIを初期化
+async function initializeUI() {
+  generateUI();
+  const settings = await loadSettings();
+
+  // カテゴリの展開/折りたたみ
+  document.querySelectorAll(".category-header").forEach((header) => {
+    header.addEventListener("click", () => {
+      const categoryDiv = header.parentElement;
+      const content = header.nextElementSibling;
+      const expandBtn = header.querySelector(".category-expand-btn");
+      const isExpanded = content.style.display !== "none";
+      content.style.display = isExpanded ? "none" : "block";
+      expandBtn.classList.toggle("expanded", !isExpanded);
+      categoryDiv.classList.toggle("expanded", !isExpanded);
+    });
+  });
+
+  // 設定値を読み込み
+  SETTINGS_CONFIG.categories.forEach((category) => {
+    category.settings.forEach((setting) => {
+      const checkbox = document.getElementById(setting.id);
+      if (checkbox) {
+        checkbox.checked = settings[setting.id];
+        const expandBtn = document.getElementById(`${setting.id}Expand`);
+        if (expandBtn) {
+          expandBtn.classList.toggle("visible", settings[setting.id]);
+        }
+      }
+
+      if (setting.details) {
+        setting.details.forEach((detail) => {
+          const element = document.getElementById(detail.id);
+          if (element) {
+            if (detail.type === "select" || detail.type === "color") {
+              element.value = settings[detail.id];
+              // リセットボタンの表示制御
+              const resetBtn = document.getElementById(`${detail.id}Reset`);
+              if (resetBtn) {
+                const isDifferent = settings[detail.id] != detail.defaultValue;
+                resetBtn.style.display = isDifferent ? "block" : "none";
+              }
+            } else if (detail.type === "checkbox") {
+              element.checked = settings[detail.id];
+            }
+          }
+        });
+      }
+    });
+  });
+
+  setupEventListeners();
+}
+
+// イベントリスナーを設定
 function setupEventListeners() {
-  const uprightCheckbox = document.getElementById("uprightSubscript");
-  const uprightSelect = document.getElementById("uprightSubscriptMinChars");
-  const uprightExpand = document.getElementById("uprightSubscriptExpand");
-  const uprightDetails = document.getElementById("uprightSubscriptDetails");
-  const normalSizeCheckbox = document.getElementById("normalSizeSubscript");
-  const normalSizeSelect = document.getElementById("normalSizeSubscriptMinChars");
-  const normalSizeApplyWhileEditingCheckbox = document.getElementById(
-    "normalSizeSubscriptApplyWhileEditing"
-  );
-  const normalSizeExpand = document.getElementById("normalSizeSubscriptExpand");
-  const normalSizeDetails = document.getElementById("normalSizeSubscriptDetails");
-  const enhancedParenthesesCheckbox = document.getElementById("enhancedParentheses");
-  const enhancedParenthesesSelect = document.getElementById("enhancedParenthesesThickness");
-  const enhancedParenthesesExpand = document.getElementById("enhancedParenthesesExpand");
-  const enhancedParenthesesDetails = document.getElementById("enhancedParenthesesDetails");
-  const colonWithSpaceCheckbox = document.getElementById("colonWithSpace");
-  const colonWithSpaceSelect = document.getElementById("colonWithSpaceWidth");
-  const colonWithSpaceExpand = document.getElementById("colonWithSpaceExpand");
-  const colonWithSpaceDetails = document.getElementById("colonWithSpaceDetails");
-  const commaWithSpaceCheckbox = document.getElementById("commaWithSpace");
-  const commaWithSpaceSelect = document.getElementById("commaWithSpaceMargin");
-  const commaWithSpaceExpand = document.getElementById("commaWithSpaceExpand");
-  const commaWithSpaceDetails = document.getElementById("commaWithSpaceDetails");
-  const displayStyleIntegralsCheckbox = document.getElementById("displayStyleIntegrals");
-  const resetBtn = document.getElementById("resetBtn");
+  SETTINGS_CONFIG.categories.forEach((category) => {
+    category.settings.forEach((setting) => {
+      const checkbox = document.getElementById(setting.id);
 
-  uprightCheckbox.addEventListener("change", async () => {
-    const settings = await loadSettings();
-    settings.uprightSubscript = uprightCheckbox.checked;
-    uprightExpand.classList.toggle("visible", uprightCheckbox.checked);
-    if (!uprightCheckbox.checked) {
-      uprightDetails.style.display = "none";
-      uprightExpand.classList.remove("expanded");
-    }
-    await saveSettings(settings);
+      if (checkbox) {
+        checkbox.addEventListener("change", async () => {
+          const settings = await loadSettings();
+          settings[setting.id] = checkbox.checked;
+          await saveSettings(settings);
+        });
+      }
+
+      if (setting.details) {
+        setting.details.forEach((detail) => {
+          const element = document.getElementById(detail.id);
+          if (element) {
+            element.addEventListener("change", async () => {
+              const settings = await loadSettings();
+              if (detail.type === "select" || detail.type === "color") {
+                const value = element.value;
+                settings[detail.id] = isNaN(value) ? value : parseFloat(value);
+                // リセットボタンの表示制御
+                const resetBtn = document.getElementById(`${detail.id}Reset`);
+                if (resetBtn) {
+                  const isDifferent = element.value != detail.defaultValue;
+                  resetBtn.style.display = isDifferent ? "block" : "none";
+                }
+              } else if (detail.type === "checkbox") {
+                settings[detail.id] = element.checked;
+              }
+              await saveSettings(settings);
+            });
+          }
+
+          // リセットボタンのイベントリスナー
+          const resetBtn = document.getElementById(`${detail.id}Reset`);
+          if (resetBtn) {
+            resetBtn.addEventListener("click", async (e) => {
+              e.stopPropagation();
+              const settings = await loadSettings();
+              settings[detail.id] = detail.defaultValue;
+              await saveSettings(settings);
+
+              const element = document.getElementById(detail.id);
+              if (element) {
+                if (detail.type === "select" || detail.type === "color") {
+                  element.value = detail.defaultValue;
+                } else if (detail.type === "checkbox") {
+                  element.checked = detail.defaultValue;
+                }
+              }
+              resetBtn.style.display = "none";
+            });
+          }
+        });
+      }
+    });
   });
 
-  uprightExpand.addEventListener("click", () => {
-    const isExpanded = uprightDetails.style.display !== "none";
-    uprightDetails.style.display = isExpanded ? "none" : "flex";
-    uprightExpand.classList.toggle("expanded", !isExpanded);
-  });
-
-  uprightSelect.addEventListener("change", async () => {
-    const settings = await loadSettings();
-    settings.uprightSubscriptMinChars = parseInt(uprightSelect.value);
-    await saveSettings(settings);
-  });
-
-  normalSizeCheckbox.addEventListener("change", async () => {
-    const settings = await loadSettings();
-    settings.normalSizeSubscript = normalSizeCheckbox.checked;
-    normalSizeExpand.classList.toggle("visible", normalSizeCheckbox.checked);
-    if (!normalSizeCheckbox.checked) {
-      normalSizeDetails.style.display = "none";
-      normalSizeExpand.classList.remove("expanded");
-    }
-    await saveSettings(settings);
-  });
-
-  normalSizeExpand.addEventListener("click", () => {
-    const isExpanded = normalSizeDetails.style.display !== "none";
-    normalSizeDetails.style.display = isExpanded ? "none" : "flex";
-    normalSizeExpand.classList.toggle("expanded", !isExpanded);
-  });
-
-  normalSizeSelect.addEventListener("change", async () => {
-    const settings = await loadSettings();
-    settings.normalSizeSubscriptMinChars = parseInt(normalSizeSelect.value);
-    await saveSettings(settings);
-  });
-
-  normalSizeApplyWhileEditingCheckbox.addEventListener("change", async () => {
-    const settings = await loadSettings();
-    settings.normalSizeSubscriptApplyWhileEditing = normalSizeApplyWhileEditingCheckbox.checked;
-    await saveSettings(settings);
-  });
-
-  enhancedParenthesesCheckbox.addEventListener("change", async () => {
-    const settings = await loadSettings();
-    settings.enhancedParentheses = enhancedParenthesesCheckbox.checked;
-    enhancedParenthesesExpand.classList.toggle("visible", enhancedParenthesesCheckbox.checked);
-    if (!enhancedParenthesesCheckbox.checked) {
-      enhancedParenthesesDetails.style.display = "none";
-      enhancedParenthesesExpand.classList.remove("expanded");
-    }
-    await saveSettings(settings);
-  });
-
-  enhancedParenthesesExpand.addEventListener("click", () => {
-    const isExpanded = enhancedParenthesesDetails.style.display !== "none";
-    enhancedParenthesesDetails.style.display = isExpanded ? "none" : "flex";
-    enhancedParenthesesExpand.classList.toggle("expanded", !isExpanded);
-  });
-
-  enhancedParenthesesSelect.addEventListener("change", async () => {
-    const settings = await loadSettings();
-    settings.enhancedParenthesesThickness = enhancedParenthesesSelect.value;
-    await saveSettings(settings);
-  });
-
-  colonWithSpaceCheckbox.addEventListener("change", async () => {
-    const settings = await loadSettings();
-    settings.colonWithSpace = colonWithSpaceCheckbox.checked;
-    colonWithSpaceExpand.classList.toggle("visible", colonWithSpaceCheckbox.checked);
-    if (!colonWithSpaceCheckbox.checked) {
-      colonWithSpaceDetails.style.display = "none";
-      colonWithSpaceExpand.classList.remove("expanded");
-    }
-    await saveSettings(settings);
-  });
-
-  colonWithSpaceExpand.addEventListener("click", () => {
-    const isExpanded = colonWithSpaceDetails.style.display !== "none";
-    colonWithSpaceDetails.style.display = isExpanded ? "none" : "flex";
-    colonWithSpaceExpand.classList.toggle("expanded", !isExpanded);
-  });
-
-  colonWithSpaceSelect.addEventListener("change", async () => {
-    const settings = await loadSettings();
-    settings.colonWithSpaceWidth = parseInt(colonWithSpaceSelect.value);
-    await saveSettings(settings);
-  });
-
-  commaWithSpaceCheckbox.addEventListener("change", async () => {
-    const settings = await loadSettings();
-    settings.commaWithSpace = commaWithSpaceCheckbox.checked;
-    commaWithSpaceExpand.classList.toggle("visible", commaWithSpaceCheckbox.checked);
-    if (!commaWithSpaceCheckbox.checked) {
-      commaWithSpaceDetails.style.display = "none";
-      commaWithSpaceExpand.classList.remove("expanded");
-    }
-    await saveSettings(settings);
-  });
-
-  commaWithSpaceExpand.addEventListener("click", () => {
-    const isExpanded = commaWithSpaceDetails.style.display !== "none";
-    commaWithSpaceDetails.style.display = isExpanded ? "none" : "flex";
-    commaWithSpaceExpand.classList.toggle("expanded", !isExpanded);
-  });
-
-  commaWithSpaceSelect.addEventListener("change", async () => {
-    const settings = await loadSettings();
-    settings.commaWithSpaceMargin = parseFloat(commaWithSpaceSelect.value);
-    await saveSettings(settings);
-  });
-
-  displayStyleIntegralsCheckbox.addEventListener("change", async () => {
-    const settings = await loadSettings();
-    settings.displayStyleIntegrals = displayStyleIntegralsCheckbox.checked;
-    await saveSettings(settings);
-  });
-
-  resetBtn.addEventListener("click", async () => {
+  // リセット
+  document.getElementById("resetBtn").addEventListener("click", async () => {
     await saveSettings(DEFAULT_SETTINGS);
     await initializeUI();
   });
@@ -256,5 +367,4 @@ function setupEventListeners() {
 // DOMが読み込まれたら初期化
 document.addEventListener("DOMContentLoaded", () => {
   initializeUI();
-  setupEventListeners();
 });

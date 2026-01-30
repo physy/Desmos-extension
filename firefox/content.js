@@ -1,18 +1,5 @@
-// デフォルト設定
-const DEFAULT_SETTINGS = {
-  uprightSubscript: false,
-  uprightSubscriptMinChars: 2,
-  normalSizeSubscript: false,
-  normalSizeSubscriptMinChars: 2,
-  normalSizeSubscriptApplyWhileEditing: false,
-  enhancedParentheses: false,
-  enhancedParenthesesThickness: "normal",
-  displayStyleIntegrals: true,
-  colonWithSpace: false,
-  colonWithSpaceWidth: 500,
-  commaWithSpace: false,
-  commaWithSpaceMargin: 0.2,
-};
+// デフォルト設定を生成（settings-config.jsから）
+const DEFAULT_SETTINGS = generateDefaultSettings();
 
 // 現在の設定
 let currentSettings = { ...DEFAULT_SETTINGS };
@@ -20,12 +7,46 @@ let currentSettings = { ...DEFAULT_SETTINGS };
 // 設定を読み込んで適用
 async function loadAndApplySettings() {
   try {
-    const result = await chrome.storage.sync.get(DEFAULT_SETTINGS);
-    currentSettings = result;
+    // まず新しいJSON形式を試みる
+    const result = await chrome.storage.sync.get("settings");
+    if (result.settings) {
+      currentSettings = { ...DEFAULT_SETTINGS, ...result.settings };
+      applySettings();
+      return;
+    }
+
+    // 新しい形式がない場合、旧形式からの移行を試みる
+    const oldSettings = await chrome.storage.sync.get(null); // すべてのキーを取得
+    const migratedSettings = {};
+    let hasMigration = false;
+
+    // DEFAULT_SETTINGSのキーが旧形式で存在するかチェック
+    for (const key in DEFAULT_SETTINGS) {
+      if (oldSettings.hasOwnProperty(key) && key !== "settings") {
+        migratedSettings[key] = oldSettings[key];
+        hasMigration = true;
+      }
+    }
+
+    if (hasMigration) {
+      // 旧形式から移行
+      currentSettings = { ...DEFAULT_SETTINGS, ...migratedSettings };
+      await chrome.storage.sync.set({ settings: currentSettings });
+
+      // 旧形式のキーを削除
+      const keysToRemove = Object.keys(DEFAULT_SETTINGS);
+      await chrome.storage.sync.remove(keysToRemove);
+
+      console.log("Settings migrated from old format to new JSON format");
+    } else {
+      currentSettings = { ...DEFAULT_SETTINGS };
+    }
+
     applySettings();
   } catch (error) {
     console.error("Failed to load settings:", error);
-    applySettings(); // デフォルト設定を適用
+    currentSettings = { ...DEFAULT_SETTINGS };
+    applySettings();
   }
 }
 
@@ -199,6 +220,166 @@ function applySettings() {
     css += `
 .dcg-exppanel-container .dcg-mq-comma {
   margin-right: ${margin}em !important;
+}
+    `;
+  }
+
+  // Transparent icons
+  if (currentSettings.transparentIcons) {
+    css += `
+.dcg-pillbox-container .dcg-pillbox-btn-interior {
+  opacity: 0.7;
+  background-color: white !important;
+}
+.dcg-pillbox-container :not(.dcg-btn-flat-gray) > .dcg-tooltip-hit-area-container {
+  backdrop-filter: blur(2px) !important;
+  border-radius: 5px;
+}
+.dcg-pillbox-container .dcg-group-horizontal, .dcg-group-vertical {
+  backdrop-filter: blur(2px) !important;
+  overflow: hidden;
+  background: none !important;
+  border-color: color-mix(
+    in srgb,
+    var(--dcg-custom-background-color-shaded, #ededed),
+    rgba(0, 0, 0, 0.1)
+  ) !important;
+}
+.dcg-toast-wrapper {
+  backdrop-filter: blur(3px) !important;
+  display: inline-block;
+}
+.dcg-toast {
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  background-color: white !important;
+  box-shadow: none !important;
+  opacity: 0.8;
+}
+.dcg-show-keypad-container .dcg-btn-flat-gray {
+  background: white !important;
+  opacity: .7 !important;
+  box-shadow: 0 0px #0000001a !important;
+}
+.dcg-show-keypad-container {
+  backdrop-filter: blur(2px) !important;
+}
+    `;
+  }
+
+  // Compact header
+  if (currentSettings.compactHeader) {
+    css += `
+.dcg-header {
+  height: 36px !important;
+  line-height: 36px !important;
+}
+.dcg-header .dcg-header-btn {
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 110% !important;
+}
+.dcg-icon-folder-open {
+  font-size: 20px !important;
+  top: 2px !important;
+}
+.align-right-container .dcg-header-btn [class^=dcg-icon-] {
+  line-height: 0 !important;
+}
+.dcg-header-bar__account-menu {
+  padding: 2px 2px 3px 4px !important;
+}
+.dcg-header .dcg-desmos-svg-logo {
+  height: 18px !important;
+}
+.dcg-header .align-center-container .dcg-home-link {
+  top: 1.5px !important;
+}
+#graph-container {
+  top: 36px !important;
+}
+.dcg-container .dcg-expression-top-bar {
+  height: 38px !important;
+  padding: 0 !important;
+  line-height: 38px !important;
+}
+.dcg-expression-top-bar .dcg-icon-btn {
+  font-size: 1rem !important;
+  height: 38px !important;
+}
+.dcg-EDIT-LIST-MODE .dcg-expression-top-bar > button {
+  padding: 0 10px !important;
+  font-size: 0.9rem !important;
+  margin: 5px !important;
+  height: 30px !important;
+  line-height: 30px !important;
+}
+.dcg-graph-actions-dropdown-anchor {
+  padding: 0 !important;
+  line-height: 28px !important;
+}
+.save-btn-container .dcg-save-button {
+  height: 28px !important;
+  padding: 0 10px !important;
+}
+    `;
+  }
+
+  // Custom background
+  if (currentSettings.customBackground) {
+    const color = currentSettings.customBackgroundColor || "white";
+    css += `
+:root {
+  --custom-primary-backgroundcolor: ${color};
+}
+.dcg-add-shadow {
+  box-shadow: none !important;
+}
+.dcg-header {
+  background: var(--custom-primary-backgroundcolor) !important;
+  color: #555 !important;
+  border-bottom: 1px solid rgba(0, 0, 0, .1) !important;
+}
+.dcg-header .dcg-header-btn {
+  color: #666 !important;
+}
+.dcg-header-bar__account-menu {
+  color: #555 !important;
+}
+.dcg-header .dcg-desmos-svg-logo {
+  filter: none !important;
+  fill: #959595 !important;
+}
+.save-btn-container .dcg-save-button.dcg-disabled {
+  color: #bbb !important;
+  border: 1px solid #ccc !important;
+}
+.dcg-container .dcg-expression-top-bar {
+  background: var(--dcg-custom-background-color-shaded, var(--custom-primary-backgroundcolor)) !important;
+  border-right: 1px solid rgba(0, 0, 0, .1) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, .1) !important;
+}
+.dcg-container .dcg-ticker {
+  background: var(--custom-primary-backgroundcolor) !important;
+  border-right: 1px solid rgba(0, 0, 0, .1) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, .1) !important;
+}
+.dcg-geometry-toolbar-view {
+  background: var(--custom-primary-backgroundcolor) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, .1) !important;
+  box-shadow: none !important;
+}
+*:not(.dcg-selected) > .dcg-tab, .cm-gutters {
+  background: var(--dcg-custom-background-color-shaded, var(--custom-primary-backgroundcolor, #fcfcfc)) !important;
+}
+.dcg-btn-light-gray, .dcg-exportable-evaluation--value, [class^=dcg-evaluation-view__]:not(.dcg-evaluation-view__equals-sign):not(.dcg-evaluation-view__list-values) {
+  border: .5px solid rgba(206, 206, 206, .8) !important;
+  background: none !important;
+}
+.dcg-ticker .dcg-mini-play-pause {
+  background-color: white !important;
+}
+.dcg-exppanel, .dsm-text-editor-container {
+  border-right: 1px solid rgba(0, 0, 0, .1) !important;
 }
     `;
   }
