@@ -82,9 +82,13 @@ const SETTINGS_CONFIG = {
               label: "Margin",
               type: "select",
               options: [
+                { value: 0.05, label: "0.05em" },
                 { value: 0.1, label: "0.1em" },
+                { value: 0.15, label: "0.15em" },
                 { value: 0.2, label: "0.2em" },
+                { value: 0.25, label: "0.25em" },
                 { value: 0.3, label: "0.3em" },
+                { value: 0.35, label: "0.35em" },
                 { value: 0.4, label: "0.4em" },
               ],
               defaultValue: 0.2,
