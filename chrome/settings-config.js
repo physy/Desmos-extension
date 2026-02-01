@@ -156,6 +156,13 @@ const SETTINGS_CONFIG = {
             },
           ],
         },
+        {
+          id: "fullscreenButton",
+          title: "Fullscreen button",
+          description: "Add a fullscreen button to the header",
+          type: "toggle",
+          defaultValue: false,
+        },
       ],
     },
   ],

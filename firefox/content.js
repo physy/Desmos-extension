@@ -317,9 +317,10 @@ function applySettings() {
   padding: 0 !important;
   line-height: 28px !important;
 }
-.save-btn-container .dcg-save-button {
+.save-btn-container .dcg-save-button, .dcg-login > button{
   height: 28px !important;
   padding: 0 10px !important;
+  line-height: 1 !important;
 }
     `;
   }
@@ -381,6 +382,23 @@ function applySettings() {
 .dcg-exppanel, .dsm-text-editor-container {
   border-right: 1px solid rgba(0, 0, 0, .1) !important;
 }
+// .dcg-keypad .dcg-keys-background, .dcg-keypad .dcg-keys-background .dcg-minimize-keypad  {
+//   background: #e9eef6 !important;
+//   box-shadow: none !important;
+// }
+// .dcg-keypad .dcg-btn-dark-on-gray {
+//   background: var(--custom-primary-backgroundcolor) !important;
+//   border: 1px solid #bbbbbba6 !important;
+// }
+    `;
+  }
+
+  // Fullscreen button
+  if (currentSettings.fullscreenButton) {
+    css += `
+.dcg-header .dcg-fullscreen-btn {
+  display: inline-flex !important;
+}
     `;
   }
 
@@ -398,3 +416,102 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // 初期化
 loadAndApplySettings();
+
+// フルスクリーンボタンを配置
+function addFullscreenButton() {
+  const header = document.querySelector(".dcg-header");
+  if (!header) {
+    return false;
+  }
+
+  // align-right-containerが存在するかチェック
+  const alignRightContainer = header.querySelector(".align-right-container");
+  if (!alignRightContainer) {
+    // align-right-containerがない場合は何もしない（smallscreenモード）
+    return false;
+  }
+
+  // すでにボタンが追加されているかチェック
+  if (alignRightContainer.querySelector(".dcg-fullscreen-btn")) {
+    return true;
+  }
+
+  const button = document.createElement("div");
+  button.className =
+    "dcg-tooltip-hit-area-container dcg-do-not-blur dcg-cursor-default dcg-fullscreen-btn";
+  button.title = "Toggle Fullscreen";
+  button.innerHTML = `
+    <div class="dcg-popover-with-anchor dcg-share-container dcg-calculator-shell-menu">
+      <div role="link" tabindex="0" aria-label="Full Screen" aria-expanded="false" aria-haspopup="true" class="dcg-unstyled-button dcg-header-btn dcg-action-share dcg-tooltip" style="display: inline-flex; justify-content: center; align-items: center;" ontap="">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          style="margin-bottom: 0.1em;"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          width="17"
+          height="17"
+        >
+          <!-- top-left -->
+          <path d="M3 9V3h6" />
+          <!-- top-right -->
+          <path d="M15 3h6v6" />
+          <!-- bottom-right -->
+          <path d="M21 15v6h-6" />
+          <!-- bottom-left -->
+          <path d="M9 21H3v-6" />
+        </svg>
+      </div>
+    </div>
+  `;
+  button.style.display = "none"; // 初期状態では非表示
+
+  button.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  });
+
+  // align-right-containerの最初に追加
+  alignRightContainer.insertBefore(button, alignRightContainer.lastChild);
+  return true;
+}
+
+// ヘッダーの変化を常に監視してフルスクリーンボタンを追加
+function setupFullscreenButtonObserver() {
+  // 初回試行
+  addFullscreenButton();
+
+  // MutationObserverでヘッダーの変更を継続的に監視
+  const observer = new MutationObserver(() => {
+    addFullscreenButton();
+  });
+
+  // ヘッダーが見つかるまで待機
+  const waitForHeader = setInterval(() => {
+    const header = document.querySelector(".dcg-header");
+    if (header) {
+      clearInterval(waitForHeader);
+      // ヘッダーが見つかったら監視開始
+      observer.observe(header, {
+        childList: true,
+        subtree: true,
+      });
+      // 監視開始後にもう一度試行
+      addFullscreenButton();
+    }
+  }, 100);
+
+  // 20秒後にタイムアウト
+  setTimeout(() => {
+    clearInterval(waitForHeader);
+  }, 20000);
+}
+
+// フルスクリーンボタンを追加
+setupFullscreenButtonObserver();
