@@ -233,6 +233,7 @@ function applySettings() {
 }
 .dcg-pillbox-container :not(.dcg-btn-flat-gray) > .dcg-tooltip-hit-area-container {
   backdrop-filter: blur(2px) !important;
+  z-index: 2 !important;
   border-radius: 5px;
 }
 .dcg-pillbox-container .dcg-group-horizontal, .dcg-group-vertical {
